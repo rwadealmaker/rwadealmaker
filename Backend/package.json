@@ -1,0 +1,42 @@
+{
+  "name": "rwa_project",
+  "version": "1.0.0",
+  "description": "Interact with CertificateToken smart contracts using Hardhat",
+  "main": "index.js",
+  "scripts": {
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/rwa_deploy.js",
+    "deploy:network": "npx hardhat run --network sepolia scripts/rwa_deploy.js",
+    "interact": "npx hardhat run scripts/interact.js",
+    "interact:network": "npx hardhat run --network sepolia scripts/interact.js",
+    "test": "npx hardhat test",
+    "node": "npx hardhat node",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum",
+    "hardhat",
+    "erc20",
+    "smart-contracts"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "hardhat": "^2.22.2",
+    "nodemon": "^3.1.10"
+  },
+  "dependencies": {
+    "@escook/express-joi": "^1.1.1",
+    "@openzeppelin/contracts": "^5.0.2",
+    "bcryptjs": "^3.0.2",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "express-jwt": "^8.5.1",
+    "mysql2": "^3.14.5",
+    "nodemailer": "^7.0.6",
+    "web3": "^4.16.0"
+  }
+}

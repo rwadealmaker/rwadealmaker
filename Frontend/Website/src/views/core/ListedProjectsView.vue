@@ -1,0 +1,1946 @@
+<template>
+  <div class="container">
+<div class="project-container">
+    <!-- 项目头部 -->
+    <header class="doc-header">
+      <h1 class="headline">
+        <template v-if="isDetailView && currentProduct">
+          {{ currentProduct.name }} - {{ currentProduct.code }}
+        </template>
+        <!-- <template v-else>
+          Property Loans
+        </template> -->
+      </h1>
+      <p class="subline">
+        <template v-if="isDetailView && currentProduct">
+          {{ currentProduct.subtitle }}
+        </template>
+        <!-- <template v-else>
+          First-lien mortgages · LTV control · Monthly interest
+        </template> -->
+      </p>
+    </header>
+
+    <!-- 加载状态 -->
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>{{ t('common.loadingProducts') }}</p>
+    </div>
+
+    <!-- 错误状态 -->
+    <div v-else-if="error" class="error-container">
+      <div class="error-message">
+        <h3>{{ t('common.loadFailed') }}</h3>
+        <!-- <p>{{ error }}</p> -->
+        <button @click="loadProducts" class="btn retry-btn">{{ t('common.retry') }}</button>
+      </div>
+    </div>
+
+    <!-- 产品列表视图 -->
+    <section v-else class="doc-list">
+      <article
+        v-for="p in filteredProducts"
+        :key="p.code"
+        class="pf-project-card"
+        aria-labelledby="'title-' + p.code"
+      >
+         <!-- 项目头部 -->
+         <div class="pf-project-header">
+           <!-- <img :src="p.image" class="pf-project-image" :alt="p.code" /> -->
+           <div class="pf-project-info">
+             <div class="pf-title-row">
+               <h4 :id="'title-' + p.code">{{ p.code }} 
+                <!-- • {{ p.name }} -->
+              </h4>
+             </div>
+             <p>{{ p.propertySummary }}</p>
+           </div>
+           <button class="pf-project-btn pf-project-btn-secondary pf-title-btn" @click="openTrade(p.code)">{{ t('project.details') }}</button>
+          </div>
+
+         <!-- 项目指标 -->
+         <div class="pf-project-metrics">
+           <!-- <div class="pf-project-metric">
+             <span class="pf-metric-label">{{ t('project.loanAmount') }}</span>
+             <span class="pf-metric-value">AUD{{ formatNumber(p.loanAmount)}}</span>
+           </div> -->
+           
+           <div class="pf-project-metric">
+              <span class="pf-metric-label">{{ t('project.issuer') }}</span>
+              <span class="pf-metric-value">{{ p.issuer || 'TBA' }}</span>
+          </div>
+          <div class="pf-project-metric">
+             <span class="pf-metric-label">{{ t('project.interestRate') }}</span>
+             <span class="pf-metric-value" style="color: #16a34a;">{{ p.interestRate }}%{{ t('project.perYear') }}</span>
+           </div>
+          <div class="pf-project-metric">
+              <span class="pf-metric-label">{{ t('trade.totalOffering') }}</span>
+              <span class="pf-metric-value">{{ (p.totalOffering) }}</span>
+          </div>
+          <!-- <div class="pf-project-metric">
+              <span class="pf-metric-label">{{ t('trade.subscribed') }}</span>
+              <span class="pf-metric-value">{{ formatNumber(p.subscribed) }}</span>
+          </div> -->
+           <!-- <div class="pf-project-metric">
+             <span class="pf-metric-label">{{ t('project.loanTerm') }}</span>
+             <span class="pf-metric-value">{{ p.loanTermMonths }}{{ t('project.months') }}</span>
+           </div>  -->
+
+          <!-- <div class="pf-project-metrics pf-project-metrics-new"> -->
+             <div class="pf-project-metric">
+               <span class="pf-metric-label">{{ t('project.underlyingAsset') }}</span>
+               <span class="pf-metric-value">{{ p.collateral || 'TBA' }}</span>
+             </div>
+             <!-- <div class="pf-project-metric">
+               <span class="pf-metric-label">{{ t('project.sponsor') }}</span>
+               <span class="pf-metric-value">{{ p.sponsor || 'TBA' }}</span>
+             </div> -->
+             <div class="pf-project-metric">
+               <span class="pf-metric-label">{{ t('project.valuer') }}</span>
+               <span class="pf-metric-value">{{ p.valuer || 'TBA' }}</span>
+             </div>
+             <div class="pf-project-metric">
+               <span class="pf-metric-label">{{ t('project.lawyer') }}</span>
+               <span class="pf-metric-value">{{ p.lawyer || 'TBA' }}</span>
+             </div>
+             <div class="pf-project-metric">
+               <span class="pf-metric-label">{{ t('project.trustee') }}</span>
+               <span class="pf-metric-value">{{ p.trustee || 'TBA' }}</span>
+             </div>
+          <!-- </div> -->
+           
+          <!-- Etherscan链接 -->
+          <div class="pf-etherscan-link" v-if="p.principalTokenAddress">
+            <a 
+              :href="`https://etherscan.io/address/${p.principalTokenAddress}`" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="etherscan-link"
+            >
+              <span class="etherscan-icon">🔗</span>
+              <span class="etherscan-text">{{ t('project.viewOnEtherscan') }}</span>
+            </a>
+          </div> 
+        </div>
+         <!-- 投资进度信息 -->
+         <!-- <div class="pf-investment-progress">
+           <div class="pf-progress-metrics">
+             <div class="pf-progress-metric">
+               <span class="pf-progress-label">{{ t('project.currentSubscription') }}</span>
+               <span class="pf-progress-value">{{ formatNumber(p.subscribed) }}</span>
+             </div>
+             <div class="pf-progress-metric">
+               <span class="pf-progress-label">{{ t('project.totalOffering') }}</span>
+               <span class="pf-progress-value">{{ formatNumber(p.totalOffering) }}</span>
+             </div>
+           </div>
+           <div class="pf-progress-bar-container">
+             <div class="pf-progress-bar">
+               <div class="pf-progress-fill" :style="{ width: getSubscriptionProgress(p) + '%' }"></div>
+             </div>
+             <div class="pf-progress-text">{{ getSubscriptionProgress(p) }}% {{ t('project.subscribed') }}</div>
+           </div>
+         </div> -->
+         <!-- 展开/收起按钮 -->
+         <!-- <div class="pf-expand-toggle" @click.stop="toggleProjectDetails(p.code)">
+           <span class="expand-text">{{ t('project.partyInfo') }}</span>
+           <span class="expand-icon" :class="{ 'expanded': isProjectExpanded(p.code) }">▼</span>
+         </div> -->
+
+         <!-- 可展开的详情内容 -->
+         <!-- <div class="pf-expandable-content" :class="{ 'expanded': isProjectExpanded(p.code) }">
+         </div> -->
+      </article>
+    </section>
+    </div>
+  </div>
+</template>
+
+<script>
+import { productAPI } from '@/service/api'
+import { useDatabaseSync } from '@/service/dataSyncService.js'
+import { useLanguage } from '@/composables/useLanguage'
+
+export default { 
+  name: 'ListedProjectsView',
+  setup() {
+    const { t } = useLanguage()
+    return { t }
+  },
+  props: {
+    code: {
+      type: String,
+      default: null
+    }
+  },
+  data(){
+    return {
+      filters: { q: '', type: '', status: '', minYield: 0, maxYield: 20 },
+      products: [],
+      currentProduct: null, // 当前选中的产品详情
+      loading: true,
+      error: null,
+      refreshInterval: null,
+      lastRefreshTime: null,
+      isDetailView: false, // 是否为详情视图
+      expandedProjects: {} // 存储每个项目的展开状态
+    }
+  },
+  async mounted() {
+    // 检查是否为详情视图
+    this.isDetailView = !!this.code
+    if (this.isDetailView) {
+      await this.loadSingleProduct()
+    } else {
+      await this.loadProducts()
+    }
+    this.setupDatabaseSync()
+  },
+  beforeUnmount() {
+    this.cleanupDatabaseSync()
+  },
+  watch: {
+    // 监听路由变化
+    '$route'(to, from) {
+      console.log('🔄 ListedProjectsView: 路由变化', { to: to.params, from: from.params })
+      // 当路由参数变化时，重新加载数据
+      if (to.params.code !== from.params.code) {
+        this.isDetailView = !!to.params.code
+        if (this.isDetailView) {
+          this.loadSingleProduct()
+        } else {
+          this.loadProducts()
+        }
+      }
+    },
+    
+    // 监听props变化（当使用props: true时，路由参数会自动作为props传递）
+    code: {
+      handler(newCode, oldCode) {
+        console.log('🔄 ListedProjectsView: Props代码变化', { newCode, oldCode })
+        this.isDetailView = !!newCode
+        if (this.isDetailView) {
+          this.loadSingleProduct()
+        } else {
+          this.loadProducts()
+        }
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    // 加载单个产品详情
+    async loadSingleProduct() {
+      try {
+        this.loading = true
+        this.error = null
+        console.log('🔄 ProjectsView: 从数据库加载单个产品数据...', this.code)
+        
+        const response = await productAPI.getProductByCode(this.code)
+
+        if (response.status === 0) {
+          // 映射数据库字段到前端期望的字段名
+          const rawData = response.data
+          const product = {
+            ...rawData,
+
+            // 基础信息
+            code: rawData.project_code,
+            name: rawData.project_name,
+            status: rawData.loan_status,
+            
+            // 认购信息
+            totalOffering: rawData.total_offering_token,
+            subscribed: rawData.subscribe_token,
+            totalOfferingRaw: rawData.total_offering_token || 0,
+            subscribedRaw: rawData.subscribe_token || 0,
+            
+            // 物业信息
+            propertyLocation: rawData.property_location,
+            propertyState: rawData.property_state,
+            propertyType: rawData.property_type,
+            propertyValue: rawData.property_value,
+            propertySummary: rawData.property_type,
+            
+            // 贷款信息
+            mortgageType: rawData.mortage_type,
+            loanAmount: rawData.loan_amount,
+            loanTermMonths: rawData.loan_term_months,
+            
+            // 贷款比率
+            lvr: rawData.lvr,
+            interestRate: rawData.interest_rate,
+            defaultRate: rawData.default_rate,
+            
+            // 贷款周期
+            commencementDate: rawData.commencement_date,
+            expiryDate: rawData.expiry_date,
+            expectedRecoveryDate: rawData.expected_recovery_date,
+            
+            // 相关主体信息
+            borrower: rawData.Borrower,
+            lender: rawData.Lender,
+            issuer: rawData.Issuer,
+            sponsor: rawData.Sponsor,
+            valuer: rawData.Valuer,
+            lawyer: rawData.Lawyer,
+            trustee: rawData.Trustee,
+            collateral: rawData.Collateral,
+            
+            // 合约地址
+            principalTokenAddress: rawData.principal_token_address,
+            interestTokenAddress: rawData.interest_token_address,
+            kycRegistryAddress: rawData.kyc_registry_address,
+            loanIssuerAddress: rawData.loan_issuer_address,
+            tradeContractAddress: rawData.trade_contract_address,
+            complianceGuardContractAddress: rawData.compliance_guard_contract_address,
+            holderRegistry: rawData.Holder_Registry,
+            
+            // 前端显示字段
+            subtitle: `${rawData.mortage_type} - ${rawData.property_type}`,
+            loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
+            loanTermFormatted: `${rawData.loan_term_months} months`,
+            targetYield: rawData.interest_rate,
+            valuation: rawData.property_value,
+            
+            // 原始数值用于计算
+            totalOfferingRaw: rawData.total_offering_token || 0,
+            subscribedRaw: rawData.subscribe_token || 0
+          }
+          
+          // 构建与列表数据结构一致的数据结构
+          this.currentProduct = {
+            // 基础信息
+            id: product.id,
+            code: product.code,
+            name: product.name,
+            status: product.status,
+            
+            // 认购信息
+            totalOffering: product.totalOffering,
+            subscribed: product.subscribed,
+            totalOfferingRaw: product.totalOfferingRaw,
+            subscribedRaw: product.subscribedRaw,
+            
+            // 物业信息
+            propertyLocation: product.propertyLocation,
+            propertyState: product.propertyState,
+            propertyType: product.propertyType,
+            propertyValue: product.propertyValue,
+            propertySummary: product.propertySummary,
+            
+            // 贷款信息
+            mortgageType: product.mortgageType,
+            loanAmount: product.loanAmount,
+            loanTermMonths: product.loanTermMonths,
+            
+            // 贷款比率
+            lvr: product.lvr,
+            interestRate: product.interestRate,
+            defaultRate: product.defaultRate,
+            
+            // 贷款周期
+            commencementDate: product.commencementDate,
+            expiryDate: product.expiryDate,
+            expectedRecoveryDate: product.expectedRecoveryDate,
+            
+            // 相关主体信息
+            borrower: product.borrower,
+            lender: product.lender,
+            issuer: product.issuer,
+            sponsor: product.sponsor,
+            valuer: product.valuer,
+            lawyer: product.lawyer,
+            trustee: product.trustee,
+            collateral: product.collateral,
+            
+            // 合约地址
+            principalTokenAddress: product.principalTokenAddress,
+            interestTokenAddress: product.interestTokenAddress,
+            kycRegistryAddress: product.kycRegistryAddress,
+            loanIssuerAddress: product.loanIssuerAddress,
+            tradeContractAddress: product.tradeContractAddress,
+            complianceGuardContractAddress: product.complianceGuardContractAddress,
+            holderRegistry: product.holderRegistry,
+            
+            // 前端显示字段
+            subtitle: product.subtitle,
+            loanAmountFormatted: product.loanAmountFormatted,
+            loanTermFormatted: product.loanTermFormatted,
+            targetYield: product.targetYield,
+            valuation: product.valuation,
+            image: product.image || this.getProductImage(product.code),
+            
+            // 计算指标
+            metrics: {
+              currentElaraPrice: this.calculateTokenPrice(product),
+              collateralPropertyValue: product.valuation ? `${product.valuation.toLocaleString()}` : 'TBA',
+              rentalIncome: this.calculateRentalIncome(product),
+              targetLoanYield: `${product.targetYield}% p.a.`
+            }
+          }
+          
+          this.lastRefreshTime = new Date()
+          console.log('✅ ProjectsView: 单个产品数据加载成功:', this.currentProduct)
+        } else {
+          this.error = response.message || '获取产品数据失败'
+          console.error('❌ ProjectsView: API返回错误:', response)
+        }
+      } catch (error) {
+        this.error = '网络错误，无法获取产品数据'
+        console.error('❌ ProjectsView: 获取单个产品数据失败:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+
+    async loadProducts() {
+      try {
+        this.loading = true
+        this.error = null
+        console.log('🔄 从数据库加载产品数据...')
+
+        const response = await productAPI.getAllProducts('ACTIVE')
+        
+        if (response.status === 0) {
+          // 映射数据库字段到前端期望的字段名
+          this.products = (response.data || []).map(project => {
+            const mappedProduct = {
+              // 基础信息
+              id: project.id,
+              code: project.project_code,
+              name: project.project_name,
+              status: project.loan_status || 'UNKNOWN',
+              
+              // 认购信息
+              totalOffering: this.formatNumber(project.total_offering_token),
+              subscribed: this.formatNumber(project.subscribe_token),
+              
+              // 原始数值用于计算
+              totalOfferingRaw: project.total_offering_token || 0,
+              subscribedRaw: project.subscribe_token || 0,
+              
+              // 物业信息
+              propertyLocation: project.property_location,
+              propertyState: project.property_state,
+              propertyType: project.property_type,
+              propertyValue: project.property_value,
+              propertySummary: project.property_type, // 使用property_type作为summary
+              
+              // 贷款信息
+              mortgageType: project.mortage_type,
+              loanAmount: project.loan_amount,
+              loanTermMonths: project.loan_term_months,
+              
+              // 贷款比率
+              lvr: project.lvr,
+              interestRate: project.interest_rate,
+              defaultRate: project.default_rate,
+              
+              // 贷款周期
+              commencementDate: project.commencement_date,
+              expiryDate: project.expiry_date,
+              expectedRecoveryDate: project.expected_recovery_date,
+              
+              // 相关主体信息
+              borrower: project.Borrower,
+              lender: project.Lender,
+              issuer: project.Issuer,
+              sponsor: project.Sponsor,
+              valuer: project.Valuer,
+              lawyer: project.Lawyer,
+              trustee: project.Trustee,
+              collateral: project.Collateral,
+              
+              // 合约地址
+              principalTokenAddress: project.principal_token_address,
+              interestTokenAddress: project.interest_token_address,
+              kycRegistryAddress: project.kyc_registry_address,
+              loanIssuerAddress: project.loan_issuer_address,
+              tradeContractAddress: project.trade_contract_address,
+              complianceGuardContractAddress: project.compliance_guard_contract_address,
+              holderRegistry: project.Holder_Registry,
+              
+              // 前端显示字段
+              subtitle: `${project.mortage_type} - ${project.property_type}`,
+              loanAmountFormatted: this.formatCurrency(project.loan_amount),
+              loanTermFormatted: `${project.loan_term_months} months`,
+              targetYield: project.interest_rate,
+              image: project.image || this.getProductImage(project.project_code)
+            }
+            
+            // 添加计算指标
+            mappedProduct.metrics = {
+              currentElaraPrice: this.calculateTokenPrice(mappedProduct),
+              collateralPropertyValue: project.property_value ? `AUD${project.property_value.toLocaleString()}` : 'TBA',
+              rentalIncome: this.calculateRentalIncome(mappedProduct),
+              targetLoanYield: `${project.interest_rate}% p.a.`
+            }
+            
+            return mappedProduct
+          })
+          this.lastRefreshTime = new Date()
+          console.log('✅ 产品数据加载成功，共', this.products.length, '个项目')
+        } else {
+          this.error = response.message || '获取产品数据失败'
+          console.error('❌ API返回错误:', response)
+        }
+      } catch (error) {
+        this.error = '网络错误，无法获取产品数据'
+        console.error('❌ 加载产品数据失败:', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    
+    // 刷新数据
+    async refreshProducts() {
+      console.log('🔄 手动刷新产品数据...')
+      if (this.isDetailView) {
+        await this.loadSingleProduct()
+      } else {
+        await this.loadProducts()
+      }
+    },
+    
+    // 设置数据库同步
+    setupDatabaseSync() {
+      const { subscribeProducts, subscribeNewProjects, getLastRefreshTime } = useDatabaseSync()
+      
+      // 订阅产品列表更新
+      this.unsubscribeProducts = subscribeProducts((products) => {
+        console.log('📡 ProjectsView: 收到产品数据更新，共', products.length, '个项目')
+        // 只处理ACTIVE状态的项目
+        const activeProducts = products.filter(product => product.status === 'ACTIVE')
+        console.log('📡 ProjectsView: 过滤后ACTIVE项目数量:', activeProducts.length)
+        
+        // 映射数据库字段到前端期望的字段名
+        this.products = activeProducts.map(product => ({
+          ...product,
+          // 基础信息
+          code: product.project_code,
+          name: product.project_name,
+          status: product.loan_status,
+          
+          // 认购信息
+          totalOffering: product.total_offering_token ? `${product.total_offering_token.toLocaleString()}` : 'N/A',
+          subscribed: product.subscribe_token ? `${product.subscribe_token.toLocaleString()}` : 'N/A',
+          totalOfferingRaw: product.total_offering_token || 0,
+          subscribedRaw: product.subscribe_token || 0,
+          
+          // 物业信息
+          propertyLocation: product.property_location,
+          propertyState: product.property_state,
+          propertyType: product.property_type,
+          propertyValue: product.property_value,
+          propertySummary: product.property_type,
+          
+          // 贷款信息
+          mortgageType: product.mortage_type,
+          loanAmount: product.loan_amount,
+          loanTermMonths: product.loan_term_months,
+          lvr: product.lvr,
+          interestRate: product.interest_rate,
+          defaultRate: product.default_rate,
+          
+          // 贷款周期
+          commencementDate: product.commencement_date,
+          expiryDate: product.expiry_date,
+          expectedRecoveryDate: product.expected_recovery_date,
+          
+          // 相关主体信息
+          borrower: product.Borrower,
+          lender: product.Lender,
+          issuer: product.Issuer,
+          sponsor: product.Sponsor,
+          valuer: product.Valuer,
+          lawyer: product.Lawyer,
+          trustee: product.Trustee,
+          collateral: product.Collateral,
+          
+          // 合约地址
+          principalTokenAddress: product.principal_token_address,
+          interestTokenAddress: product.interest_token_address,
+          kycRegistryAddress: product.kyc_registry_address,
+          loanIssuerAddress: product.loan_issuer_address,
+          tradeContractAddress: product.trade_contract_address,
+          complianceGuardContractAddress: product.compliance_guard_contract_address,
+          holderRegistry: product.Holder_Registry,
+          
+          // 前端显示字段
+          subtitle: `${product.mortage_type} - ${product.property_type}`,
+          loanAmountFormatted: product.loan_amount ? `AUD${product.loan_amount.toLocaleString()}` : 'AUD0',
+          loanTermFormatted: `${product.loan_term_months} months`,
+          targetYield: product.interest_rate,
+          image: product.image || this.getProductImage(product.project_code)
+        }))
+        this.lastRefreshTime = new Date()
+      })
+      
+      // 订阅新项目通知
+      this.unsubscribeNewProjects = subscribeNewProjects((newProjects) => {
+        console.log('🆕 ProjectsView: 发现', newProjects.length, '个新项目')
+        // 可以在这里添加新项目通知逻辑
+        this.showNewProjectsNotification(newProjects)
+      })
+      
+      // 设置最后刷新时间
+      const lastRefresh = getLastRefreshTime()
+      if (lastRefresh) {
+        this.lastRefreshTime = lastRefresh
+      }
+    },
+    
+    // 清理数据库同步
+    cleanupDatabaseSync() {
+      if (this.unsubscribeProducts) {
+        this.unsubscribeProducts()
+      }
+      if (this.unsubscribeNewProjects) {
+        this.unsubscribeNewProjects()
+      }
+    },
+    
+    // 显示新项目通知
+    showNewProjectsNotification(newProjects) {
+      if (newProjects.length > 0) {
+        const projectNames = newProjects.map(p => p.name).join(', ')
+        console.log('🆕 发现新项目:', projectNames)
+        // 可以在这里添加用户通知
+      }
+    },
+    
+    // 开始自动刷新（保留作为备用）
+    startAutoRefresh() {
+      // 每30秒自动刷新一次数据
+      this.refreshInterval = setInterval(() => {
+        console.log('🔄 自动刷新产品数据...')
+        this.loadProducts()
+      }, 30000) // 30秒
+    },
+    
+    // 停止自动刷新（保留作为备用）
+    stopAutoRefresh() {
+      if (this.refreshInterval) {
+        clearInterval(this.refreshInterval)
+        this.refreshInterval = null
+        console.log('停止自动刷新')
+      }
+    },
+    formatCurrency(value, currency = 'AUD') {
+      if (value === null || value === undefined || value === '') return `${currency}0.00`
+      const num = parseFloat(value)
+      if (isNaN(num)) return `${currency}0.00`
+      return `${currency}${num.toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })}`
+    },
+
+    resetFilters(){ this.filters = { q: '', type: '', risk: '', status: '', minYield: 0, maxYield: 20 } },
+    
+    // 监听筛选器变化
+    onFilterChange() {
+      console.log('筛选器变化:', this.filters)
+      // 强制重新计算筛选结果
+      this.$forceUpdate()
+    },
+
+
+    openTrade(code){
+      // 在列表视图中从products数组查找，在详情视图中使用currentProduct
+      const product = this.isDetailView ? this.currentProduct : this.products.find(x => x.code === code)
+      try { sessionStorage.setItem('lastProduct', JSON.stringify(product)) } catch(e) {}
+      this.$router.push({ 
+        name: 'tradeProject', 
+        params: { code },
+        query: { type: 'buy' }
+      })
+    },
+    getProgressPercentage(product) {
+      if (!product) return 0
+      
+      // 使用原始数值进行计算
+      const total = product.totalOfferingRaw || 0
+      const subscribed = product.subscribedRaw || 0
+      
+      if (total === 0) return 0
+      
+      const percentage = (subscribed / total) * 100
+      return Math.min(Math.round(percentage), 100)
+    },
+    // getStatusText(status) {
+    //   const statusMap = {
+    //     'INCOMING': 'Incoming',
+    //     'ACTIVE': 'Active',
+    //     'PERFORMING': 'Performing',
+    //     'DEFAULT': 'Default',
+    //     'COMPLETED': 'Completed',
+    //   }
+    //   return statusMap[status] || 'Unknown'
+    // },
+    joinWaitlist(code) {
+      this.addToWatchlist(code)
+    },
+    registerInterest(code) {
+      this.addToWatchlist(code)
+    },
+    
+    // 添加到 watchlist
+    addToWatchlist(code) {
+      try {
+        // 获取现有的 watchlist
+        let watchlist = []
+        const savedWatchlist = localStorage.getItem('projectWatchlist')
+        if (savedWatchlist) {
+          watchlist = JSON.parse(savedWatchlist)
+        }
+        
+        // 检查是否已经在 watchlist 中
+        if (watchlist.includes(code)) {
+          alert('This Project is already in your watchlist!')
+          return
+        }
+        
+        // 添加到 watchlist
+        watchlist.push(code)
+        localStorage.setItem('projectWatchlist', JSON.stringify(watchlist))
+        
+        const product = this.products.find(x => x.code === code)
+        alert(`Added ${product.name} to your watchlist!`)
+        console.log('Added to watchlist:', code)
+      } catch (error) {
+        console.error('❌ Projects: Failed to add to watchlist:', error)
+        alert('Failed to add to watchlist, please try again')
+      }
+    },
+    
+    // 格式化时间显示
+    formatTime(date) {
+      if (!date) return ''
+      const now = new Date()
+      const diff = now - date
+      const minutes = Math.floor(diff / 60000)
+      
+      if (minutes < 1) return 'Just now'
+      if (minutes < 60) return `${minutes} minutes ago`
+      
+      const hours = Math.floor(minutes / 60)
+      if (hours < 24) return `${hours} hours ago`
+      
+      const days = Math.floor(hours / 24)
+      return `${days} days ago`
+    },
+    
+    // 获取产品图片
+    getProductImage(code) {
+      const imageMap = {
+        'RWA001': '/pics/TYMU.png',
+        'RWA002': '/pics/SQNB.png',
+        'RWA003': '/pics/LZYT.png',
+        'YYD': '/pics/YYD.png',
+        'COMP': '/pics/TYMU.png'
+      }
+      return imageMap[code] || '/pics/TYMU.png'
+    },
+    
+    // 计算代币价格
+    calculateTokenPrice(product) {
+      // 基于目标收益率计算代币价格
+      const basePrice = 1.00
+      const yieldMultiplier = (product.targetYield || 6.0) / 6.0
+      const adjustedPrice = basePrice * yieldMultiplier
+      return `AUD${adjustedPrice.toFixed(2)}`
+    },
+    
+    // 计算租金收入
+    calculateRentalIncome(product) {
+      // 基于房产价值和收益率估算租金收入
+      if (!product.valuation) return 'TBA'
+      
+      const valuationStr = product.valuation.replace(/[AUD,]/g, '')
+      const valuation = parseFloat(valuationStr)
+      const monthlyYield = (product.targetYield || 6.0) / 12 / 100
+      const estimatedRental = valuation * monthlyYield
+      
+      return `AUD${estimatedRental.toLocaleString('en-AU', { maximumFractionDigits: 0 })} / month`
+    },
+
+    // 计算认购进度
+    getSubscriptionProgress(product) {
+      if (!product) {
+        return 0
+      }
+      
+      // 使用原始数值进行计算
+      const total = product.totalOfferingRaw || 0
+      const subscribed = product.subscribedRaw || 0
+      
+      if (total === 0) return 0
+      
+      const progress = (subscribed / total) * 100
+      return Math.round(progress * 100) / 100 // 保留两位小数
+    },
+
+    // 格式化数字
+    formatNumber(value) {
+      if (!value) return '0'
+      const num = parseFloat(value)
+      if (isNaN(num)) return value
+      return num.toLocaleString()
+    },
+
+    // 切换项目详情展开状态
+    toggleProjectDetails(projectCode) {
+      console.log('🔄 切换项目展开状态:', projectCode, '当前状态:', this.expandedProjects[projectCode])
+      // Vue 3 中直接修改响应式对象
+      this.expandedProjects[projectCode] = !this.expandedProjects[projectCode]
+      console.log('✅ 切换后状态:', this.expandedProjects[projectCode])
+    },
+
+    // 检查项目是否已展开
+    isProjectExpanded(projectCode) {
+      return !!this.expandedProjects[projectCode]
+    }
+  },
+  computed: {
+    filteredProducts(){
+      const q = this.filters.q.trim().toLowerCase()
+      return this.products.filter(p => {
+        // 只显示ACTIVE状态的项目
+        if (p.status !== 'ACTIVE') {
+          return false
+        }
+        
+        // 搜索匹配：代码、名称、副标题
+        const matchQ = !q || 
+          (p.code || '').toLowerCase().includes(q) || 
+          (p.name || '').toLowerCase().includes(q) ||
+          (p.subtitle || '').toLowerCase().includes(q)
+        
+        // 类型匹配
+        const matchType = !this.filters.type || p.property_type === this.filters.type
+        
+        // 状态匹配（由于已经过滤了ACTIVE，这里可以简化）
+        const matchStatus = !this.filters.status || p.status === this.filters.status
+        
+        // EST. YIELD (IRR) 区间匹配
+        const targetYield = parseFloat(p.targetYield) || 0
+        const matchYield = targetYield >= this.filters.minYield && targetYield <= this.filters.maxYield
+        
+        return matchQ && matchType && matchStatus && matchYield
+      }).sort((a, b) => {
+        // 按project code升序排列，处理空值情况
+        const codeA = a.code || ''
+        const codeB = b.code || ''
+        return codeA.localeCompare(codeB)
+      })
+    },
+    
+    // 检查是否有激活的筛选条件
+    hasActiveFilters() {
+      return this.filters.q.trim() !== '' || 
+             this.filters.type !== '' || 
+             this.filters.status !== '' || 
+             this.filters.minYield > 0 || 
+             this.filters.maxYield < 20
+    },
+
+    projectData() {
+      // 从currentProduct获取项目数据（保留作为备用）
+      const product = this.currentProduct
+      
+      if (product) {
+        console.log('ListedProjectsView: Retrieve project data from currentProduct:', product)
+        
+        // 构建符合模板需求的数据结构，完整映射数据库字段
+        return {
+          // 基本信息
+          code: product.code,
+          name: product.name,
+          image: product.image || this.getProductImage(product.code),
+          subtitle: product.subtitle,
+          type: product.type,
+          risk: product.risk,
+          targetYield: product.targetYield,
+          status: product.status,
+          summary: product.summary,
+          
+          // 投资信息
+          totalOffering: product.totalOffering,
+          subscribed: product.subscribed,
+          totalSubscriptionTokens: product.totalSubscriptionTokens,
+          subscribedTokens: product.subscribedTokens,
+          
+          // 计算指标
+          metrics: {
+            currentElaraPrice: this.calculateTokenPrice(product),
+            collateralPropertyValue: product.valuation || 'TBA',
+            targetLoanYield: `${product.targetYield}% p.a.`
+          },
+          
+          // Key Facts 关键信息
+          loanAmount: product.loanAmount,
+          annualInterestRate: product.annualInterestRate,
+          loanTerm: product.loanTerm,
+          ltv: product.ltv,
+          drawdownDate: product.drawdownDate,
+          earlyRepayment: product.earlyRepayment,
+          repaymentArrangement: product.repaymentArrangement,
+          
+          // Parties 相关主体
+          issuer: product.issuer,
+          pwShareholders: product.pwShareholders,
+          lender: product.lender,
+          borrower: product.borrower,
+          guarantor: product.guarantor,
+          
+          // 新增项目指标字段
+          underlyingAsset: product.collateral || 'TBA',
+          sponsor: product.sponsor || 'TBA',
+          valuer: product.valuer || 'TBA',
+          lawyer: product.lawyer || 'TBA',
+          trustee: product.trustee || 'TBA',
+          
+          // Disbursement & Interest 放款和利息
+          disbursementMethod: product.disbursementMethod,
+          interest: product.interest,
+          earlyRepaymentDetails: product.earlyRepaymentDetails,
+          maturityDate: product.expiryDate,
+          
+          // Collateral 抵押品
+          propertyAddress: product.propertyLocation,
+          valuation: product.valuation,
+          securityRank: product.securityRank,
+          
+          // Default & Remedies 违约和补救措施
+          defaultInterestRate: product.defaultInterestRate,
+          defaultTriggers: product.defaultTriggers,
+          defaultProcess: product.defaultProcess,
+          
+          // On-Chain & Documents 链上和文档
+          issuerToken: product.issuerToken,
+          loanToken: product.loanToken,
+          valuationReport: product.valuationReport,
+          mortgageDeed: product.mortgageDeed
+        }
+      }
+    }
+  } 
+}
+</script>
+
+<style scoped>
+:root{
+  --orange:#f59e0b;
+  --ink:#e5e7eb;
+  --paper:#0e0f1b;
+  --rule:#2a2c3f;
+  --muted:#9ca3af;
+}
+
+.container {
+  background: 
+        radial-gradient(circle at 20% 80%, rgba(51, 204, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(0, 153, 204, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(25, 25, 112, 0.1) 0%, transparent 50%);
+  min-height: 100vh;
+  padding: 20px 130px;
+  margin: 0;
+  width: 100vw;
+  max-width: none;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+
+.project-container{
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.doc-header{
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: 10px;
+  margin-bottom: 16px;
+}
+.headline {
+  color: var(--text) !important;
+  margin: 0 0 6px 0;
+}
+.subline{
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.filters {
+  background: transparent;
+  padding: 16px 0;
+  border: none;
+  margin-bottom: 20px;
+}
+.filters .input {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.filters .input::placeholder { color: var(--text-secondary); }
+.filters .btn {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.filters .btn:hover { background: var(--hover-bg); }
+
+/* 收益率区间滑块样式 */
+.yield-range-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.yield-range-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.yield-range-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 25px;
+}
+
+.yield-range-display {
+  font-size: 14px;
+  color: var(--text);
+  font-weight: 600;
+  white-space: nowrap;
+  padding: 0;
+}
+
+.yield-range-slider {
+  position: relative;
+  height: 20px;
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  padding: 0 10px;
+  flex: 1;
+  max-width: 200px;
+}
+
+.yield-slider {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: transparent;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.yield-slider::-webkit-slider-track {
+  width: 100%;
+  height: 4px;
+  background: #4b5563;
+  border-radius: 2px;
+  border: none;
+}
+
+.yield-slider::-moz-range-track {
+  width: 100%;
+  height: 4px;
+  background: #4b5563;
+  border-radius: 2px;
+  border: none;
+}
+
+.yield-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.yield-slider::-webkit-slider-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+.yield-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.yield-slider::-moz-range-thumb:hover {
+  background: #2563eb;
+  transform: scale(1.1);
+}
+
+.yield-slider-min::-webkit-slider-thumb {
+  background: #242524;
+}
+
+.yield-slider-min::-webkit-slider-thumb:hover {
+  background: #242524;
+}
+
+.yield-slider-min::-moz-range-thumb {
+  background: #242524;
+}
+
+.yield-slider-min::-moz-range-thumb:hover {
+  background: #242524;
+}
+
+.yield-slider-max::-webkit-slider-thumb {
+  background: #09740f;
+}
+
+.yield-slider-max::-webkit-slider-thumb:hover {
+  background: #09740f;
+}
+
+.yield-slider-max::-moz-range-thumb {
+  background: #09740f;
+}
+
+.yield-slider-max::-moz-range-thumb:hover {
+  background: #09740f;
+}
+
+.refresh-btn:hover:not(:disabled) { 
+  background: #4b5563 !important; 
+  border-color: #6b7280 !important; 
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: var(--muted);
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #374151;
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+}
+
+.error-message {
+  text-align: center;
+  color: var(--muted);
+}
+
+.error-message h3 {
+  color: #ef4444;
+  margin-bottom: 8px;
+}
+
+.retry-btn {
+  background: #ef4444;
+  border: 1px solid #ef4444;
+  color: #ffffff;
+  margin-top: 12px;
+}
+
+.retry-btn:hover {
+  background: #dc2626;
+  border-color: #dc2626;
+}
+
+.doc-list{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2px;
+}
+
+/* 新的项目卡片样式 */
+.pf-project-card{
+  width:100%;
+  padding:16px;
+  border-radius:12px;
+  background: var(--card-bg);
+  border:1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.pf-project-header{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+.pf-project-image{width:40px;height:40px;border-radius:8px;}
+.pf-project-info{flex:1;}
+.pf-title-row{display:flex;justify-content:space-between;align-items:center;gap:12px;}
+.pf-project-info h4{margin:0;font-size:16px;font-weight:700;color: var(--text);flex:1;}
+.pf-project-info p{margin:4px 0 0 0;font-size:12px;color: var(--text-secondary);}
+.pf-title-btn{padding:6px 12px;font-size:12px;white-space:nowrap;}
+
+.pf-project-metrics{margin-bottom:16px;}
+.pf-project-metric{display:flex;justify-content:space-between;align-items:center;padding:4px 0;}
+.pf-metric-label{font-size:12px;color: var(--text-secondary);}
+.pf-metric-value{font-size:14px;font-weight:600;color: var(--text);}
+.pf-metric-value.risk-low{color:#16a34a;}
+.pf-metric-value.risk-medium{color:#d97706;}
+.pf-metric-value.risk-high{color:#dc2626;}
+
+/* 新增项目指标样式 */
+.pf-project-metrics-new{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid rgba(255,255,255,0.1);
+}
+.pf-project-metrics-new .pf-project-metric{
+  padding:6px 0;
+}
+.pf-project-metrics-new .pf-metric-label{
+  font-size:11px;
+  color: var(--text-secondary);
+}
+.pf-project-metrics-new .pf-metric-value{
+  font-size:13px;
+  color: var(--text);
+}
+
+/* 投资进度信息样式 */
+.pf-investment-progress{
+  margin-bottom:16px;
+  padding:16px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.1);
+  border-radius:12px;
+}
+
+/* 浅色主题下的投资进度样式 */
+[data-theme="light"] .pf-investment-progress{
+  background: #f3f4f6;
+  border: 1px solid #d1d5db;
+}
+
+.pf-progress-metrics{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin-bottom:16px;
+  align-items:stretch;
+  text-align:justify;
+}
+
+.pf-progress-metric{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+
+.pf-progress-label{
+  font-size:10px;
+  color: var(--text-secondary);
+  text-transform:uppercase;
+  letter-spacing:0.5px;
+  margin-bottom:4px;
+}
+
+.pf-progress-value{
+  font-size:14px;
+  font-weight:700;
+  color: var(--text);
+}
+
+.pf-progress-bar-container{
+  margin-top:12px;
+}
+
+.pf-progress-bar{
+  width:100%;
+  height:6px;
+  background:var(--border-light);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:8px;
+}
+
+.pf-progress-fill{
+  height:100%;
+  background:linear-gradient(90deg,#10b981,#059669);
+  border-radius:3px;
+  transition:width 0.5s ease;
+}
+
+/* 浅色主题下的进度条颜色 */
+[data-theme="light"] .pf-progress-fill{
+  background:linear-gradient(90deg,#059669,#047857);
+}
+
+.pf-progress-text{
+  text-align:center;
+  font-size:12px;
+  font-weight:600;
+  color:#10b981;
+}
+
+/* 浅色主题下的进度文字颜色 */
+[data-theme="light"] .pf-progress-text{
+  color:#059669;
+}
+
+.pf-project-actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+.pf-project-btn{padding:8px 16px;border-radius:8px;border:1px solid #374151;background:#1f2937;color:#ffffff;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s ease;}
+.pf-project-btn:hover{background:#d97706;}
+  .pf-project-btn-secondary{background:var(--primary);color:#fff;border-color:var(--primary);}
+  .pf-project-btn-secondary:hover{background:var(--primary-ink);}
+  
+  /* 浅色主题下的详情按钮样式 */
+  [data-theme="light"] .pf-project-btn-secondary{
+    background: #ffffff;
+    color: #374151;
+    border-color: #374151;
+  }
+  [data-theme="light"] .pf-project-btn-secondary:hover{
+    background: #f3f4f6;
+    color: #374151;
+    border-color: #374151;
+  }
+  .pf-project-btn-interest{background:#dc2626;color:#fff;border-color:#dc2626;}
+.pf-project-btn-interest:hover{background:#b91c1c;}
+
+/* 保留原有的doc-card样式作为备用 */
+.doc-card{
+  background: #141426;
+  border: 1px solid var(--rule);
+  border-radius: 14px;
+  padding: 18px;
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(0,0,0,.25);
+}
+
+/* 项目基本信息样式 */
+.project-basic-info{
+  display: flex;
+  gap: 16px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+.info-item{
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.info-label{
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-value{
+  font-size: 14px;
+  color: #828386;
+  font-weight: 600;
+}
+
+.info-value.risk-low{
+  color: #059669;
+}
+
+.info-value.risk-medium{
+  color: #d97706;
+}
+
+.info-value.risk-high{
+  color: #dc2626;
+}
+
+.main-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.left-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.title-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.title-section h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #fff;
+  letter-spacing: .2px;
+  flex: 1;
+}
+
+
+.doc-code {
+  display: inline-block;
+  padding: 2px 8px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  margin-right: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.doc-name { 
+  font-weight: 700;
+}
+
+.doc-subtitle {
+  margin: 6px 0 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.summary-section {
+  margin: 6px 0 2px;
+}
+
+
+.doc-cover {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 1px solid var(--rule);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sep{
+  border: none;
+  border-top: 1px dashed var(--rule);
+  margin: 14px 0;
+}
+
+.doc-section{ margin: 6px 0 2px; }
+.doc-h3{
+  margin: 0 0 8px 0;
+  color: #eaeaf0;
+  font-size: 14px;
+  letter-spacing: .2px;
+  text-transform: uppercase;
+}
+.doc-text{
+  margin: 0;
+  color: var(--ink);
+  line-height: 1.6;
+}
+
+.investment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.investment-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.investment-label {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.investment-value {
+  font-size: 14px;
+  color: #fff;
+  font-weight: 600;
+}
+
+
+.progress-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--rule);
+}
+
+.progress-actions-row .progress-container {
+  flex: 1;
+  margin-top: 0;
+}
+
+.progress-actions-row .doc-actions {
+  display: flex;
+  gap: 12px;
+  margin: 0;
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 8px;
+  background: transparent;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+  transition: width 0.3s ease;
+}
+
+.progress-empty {
+  height: 100%;
+  background: #374151;
+  transition: width 0.3s ease;
+}
+
+.progress-text {
+  color: #10b981;
+  font-weight: 600;
+  font-size: 13px;
+  min-width: 35px;
+  text-align: right;
+}
+
+.doc-actions{
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+.btn.small {
+  color: #ffffff !important;
+  background: #1f2937;
+  border: 1px solid #374151;
+  padding: 8px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.btn.small:hover { background: #374151; border-color: #4b5563; }
+.btn.small.orange { color:#fff !important; background:#f97316; border-color:#f97316; }
+.btn.small.orange:hover { background:#ea580c; border-color:#ea580c; }
+
+@media (max-width: 1200px){
+  .doc-list {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 980px){
+  .main-content {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .doc-cover {
+    width: 200px;
+    height: 140px;
+  }
+}
+
+
+@media (max-width: 768px){
+  .doc-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px 30px;
+  }
+  
+  /* 手机端页边距 */
+  .main-content {
+    padding: 0 30px;
+  }
+  
+  .container {
+    padding: 0 30px;
+  }
+  
+  .pf-project-card {
+    padding: 16px;
+    width: 100%;
+  }
+  
+  .pf-project-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+  
+  .pf-title-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .pf-title-btn {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+  
+  .pf-project-image {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto;
+  }
+  
+  .pf-project-metrics {
+    gap: 12px;
+    margin: 16px 0;
+  }
+  
+  .pf-project-metrics-new {
+    margin-top: 8px;
+    padding-top: 8px;
+  }
+  
+  .pf-progress-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  
+  .pf-investment-progress {
+    padding: 12px;
+  }
+  
+  .investment-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  
+  
+  .progress-actions-row {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .progress-actions-row .progress-container {
+    order: 1;
+  }
+  
+  .progress-actions-row .doc-actions {
+    order: 2;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 640px){
+  .doc-list {
+    grid-template-columns: 1fr;
+    padding: 12px 30px;
+    gap: 12px;
+  }
+  
+  /* 小屏手机端页边距 */
+  .main-content {
+    padding: 0 30px;
+  }
+  
+  .container {
+    padding: 0 30px;
+  }
+  
+  .pf-project-card {
+    padding: 12px;
+  }
+  
+  .pf-project-metrics {
+    gap: 8px;
+  }
+  
+  .pf-project-metric {
+    padding: 8px;
+  }
+  
+  .pf-project-metrics-new {
+    margin-top: 6px;
+    padding-top: 6px;
+  }
+  
+  .pf-project-metrics-new .pf-project-metric {
+    padding: 4px 0;
+  }
+  
+  .pf-progress-metrics {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+  
+  .pf-investment-progress {
+    padding: 10px;
+  }
+  
+  .pf-progress-label {
+    font-size: 9px;
+  }
+  
+  .pf-progress-value {
+    font-size: 12px;
+  }
+  
+  .pf-project-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .pf-project-btn {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .investment-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  
+  .investment-label {
+    font-size: 11px;
+  }
+  
+  .investment-value {
+    font-size: 13px;
+  }
+  
+  .main-content {
+    gap: 12px;
+  }
+  
+  .doc-cover {
+    width: 100%;
+    height: 120px;
+  }
+  
+  .yield-range-filter {
+    min-width: 150px;
+  }
+  
+  .yield-range-display {
+    font-size: 12px;
+    padding: 0;
+  }
+  
+  .yield-slider::-webkit-slider-thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .yield-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .title-section h2 {
+    font-size: 18px;
+  }
+  
+  .doc-subtitle {
+    font-size: 13px;
+  }
+}
+
+/* Etherscan链接样式 */
+.pf-etherscan-link {
+  margin-top: 16px;
+  padding-top: 0px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.etherscan-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  color: #60a5fa;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.etherscan-link:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  color: #93c5fd;
+  text-decoration: none;
+}
+
+.etherscan-icon {
+  font-size: 16px;
+}
+
+.etherscan-text {
+  font-size: 14px;
+}
+
+/* 展开/收起功能样式 */
+.pf-expand-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: var(--card-subtle);
+  border: 1px solid var(--border-light);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+
+.pf-expand-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.expand-text {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.expand-icon {
+  font-size: 12px;
+  color: #9ca3af;
+  transition: transform 0.3s ease;
+  transform: rotate(0deg);
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.pf-expandable-content {
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.pf-expandable-content.expanded {
+  max-height: 500px;
+  opacity: 1;
+  margin-top: 12px;
+}
+
+/* 移动端响应式样式 */
+@media (max-width: 768px) {
+  .pf-etherscan-link {
+    margin-top: 12px;
+    padding-top: 0px;
+  }
+  
+  .etherscan-link {
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+  
+  .etherscan-icon {
+    font-size: 14px;
+  }
+  
+  .etherscan-text {
+    font-size: 13px;
+  }
+
+  /* 移动端展开功能样式 */
+  .pf-expand-toggle {
+    margin-top: 8px;
+    padding: 6px 10px;
+  }
+
+  .expand-text {
+    font-size: 11px;
+  }
+
+  .expand-icon {
+    font-size: 11px;
+  }
+
+  .pf-expandable-content.expanded {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .etherscan-link {
+    padding: 5px 8px;
+    font-size: 12px;
+  }
+  
+  .etherscan-icon {
+    font-size: 12px;
+  }
+  
+  .etherscan-text {
+    font-size: 12px;
+  }
+}
+</style>
