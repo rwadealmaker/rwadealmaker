@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "buildCommand": "cd Frontend/Website && npm install && npm run build",
+  "outputDirectory": "Frontend/Website/dist",
+  "installCommand": "cd Frontend/Website && npm install",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
