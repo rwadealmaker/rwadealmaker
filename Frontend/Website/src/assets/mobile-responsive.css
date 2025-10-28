@@ -1,200 +1,265 @@
-/* 通用手机端响应式样式 - 30px页边距 */
+/* 通用手机端响应式样式 - 统一断点策略 */
 
-/* 平板端适配 */
+/* 平板横屏 - 1024px */
+@media (max-width: 1024px) {
+  /* 通用容器页边距 */
+  .container,
+  .main-content,
+  .page-container,
+  .content-wrapper {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+  }
+
+  /* 网格布局调整 */
+  .grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 平板竖屏 - 768px */
 @media (max-width: 768px) {
   /* 通用容器页边距 */
   .container,
   .main-content,
   .page-container,
   .content-wrapper {
-    padding-left: 30px !important;
-    padding-right: 30px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
-  
+
   /* 卡片和表单容器 */
   .card,
   .form-container,
   .auth-container,
   .modal-container {
-    margin-left: 30px;
-    margin-right: 30px;
-    width: calc(100% - 60px);
+    margin-left: 20px;
+    margin-right: 20px;
+    width: calc(100% - 40px);
   }
-  
+
   /* 标题字体大小调整 */
   h1 {
     font-size: 24px;
   }
-  
+
   h2 {
     font-size: 20px;
   }
-  
+
   h3 {
     font-size: 18px;
   }
-  
-  /* 按钮调整 */
+
+  /* 按钮调整 - 确保44x44px最小触摸目标 */
   .btn,
   .btn-primary,
-  .btn-secondary {
+  .btn-secondary,
+  button {
+    min-height: 44px;
     padding: 12px 20px;
     font-size: 14px;
   }
-  
-  /* 输入框调整 */
+
+  /* 输入框调整 - 确保44px最小高度 */
   .input,
   .form-input,
-  .auth-input {
+  .auth-input,
+  input,
+  textarea,
+  select {
+    min-height: 44px;
     padding: 12px 16px;
     font-size: 14px;
   }
-  
+
   /* 网格布局调整 */
-  .grid {
+  .grid,
+  .grid-2,
+  .grid-3 {
     grid-template-columns: 1fr;
     gap: 16px;
   }
-  
-  .grid-2 {
-    grid-template-columns: 1fr;
-  }
-  
-  .grid-3 {
-    grid-template-columns: 1fr;
-  }
-  
+
   /* 导航栏调整 */
   .navbar,
   .header {
-    padding: 0 30px;
+    padding: 0 20px;
   }
-  
+
   /* 页脚调整 */
   .footer {
-    padding: 20px 30px;
+    padding: 20px 20px;
   }
 }
 
-/* 手机端适配 */
+/* 手机端适配 - 640px */
+@media (max-width: 640px) {
+  /* 通用容器页边距 */
+  .container,
+  .main-content,
+  .page-container,
+  .content-wrapper {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* 卡片和表单容器 */
+  .card,
+  .form-container,
+  .auth-container,
+  .modal-container {
+    margin-left: 16px;
+    margin-right: 16px;
+    width: calc(100% - 32px);
+    padding: 14px;
+  }
+
+  /* 标题字体大小调整 */
+  h1 {
+    font-size: 22px;
+  }
+
+  h2 {
+    font-size: 19px;
+  }
+
+  h3 {
+    font-size: 17px;
+  }
+}
+
+/* 中小手机 - 480px */
 @media (max-width: 480px) {
   /* 通用容器页边距 */
   .container,
   .main-content,
   .page-container,
   .content-wrapper {
-    padding-left: 30px !important;
-    padding-right: 30px !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
   }
-  
+
   /* 卡片和表单容器 */
   .card,
   .form-container,
   .auth-container,
   .modal-container {
-    margin-left: 30px;
-    margin-right: 30px;
-    width: calc(100% - 60px);
-    padding: 16px;
+    margin-left: 12px;
+    margin-right: 12px;
+    width: calc(100% - 24px);
+    padding: 12px;
   }
-  
+
   /* 标题字体大小调整 */
   h1 {
     font-size: 20px;
   }
-  
+
   h2 {
     font-size: 18px;
   }
-  
+
   h3 {
     font-size: 16px;
   }
-  
-  /* 按钮调整 */
+
+  /* 按钮调整 - 保持44px最小触摸目标 */
   .btn,
   .btn-primary,
-  .btn-secondary {
-    padding: 10px 16px;
-    font-size: 13px;
+  .btn-secondary,
+  button {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 14px;
   }
-  
-  /* 输入框调整 */
+
+  /* 输入框调整 - 保持44px最小高度 */
   .input,
   .form-input,
-  .auth-input {
-    padding: 10px 14px;
-    font-size: 13px;
+  .auth-input,
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    padding: 12px 14px;
+    font-size: 14px;
   }
-  
+
   /* 文本调整 */
   p, span, div {
     font-size: 14px;
   }
-  
+
   /* 导航栏调整 */
   .navbar,
   .header {
-    padding: 0 30px;
+    padding: 0 12px;
   }
-  
+
   /* 页脚调整 */
   .footer {
-    padding: 16px 30px;
+    padding: 16px 12px;
   }
 }
 
-/* 超小屏幕适配 */
+/* 超小屏幕适配 - 375px */
 @media (max-width: 375px) {
   /* 确保最小页边距 */
   .container,
   .main-content,
   .page-container,
   .content-wrapper {
-    padding-left: 30px !important;
-    padding-right: 30px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
   }
-  
+
   /* 卡片和表单容器 */
   .card,
   .form-container,
   .auth-container,
   .modal-container {
-    margin-left: 30px;
-    margin-right: 30px;
-    width: calc(100% - 60px);
-    padding: 12px;
+    margin-left: 10px;
+    margin-right: 10px;
+    width: calc(100% - 20px);
+    padding: 10px;
   }
-  
+
   /* 标题字体大小调整 */
   h1 {
     font-size: 18px;
   }
-  
+
   h2 {
     font-size: 16px;
   }
-  
+
   h3 {
     font-size: 14px;
   }
-  
-  /* 按钮调整 */
+
+  /* 按钮调整 - 仍保持44px最小触摸目标 */
   .btn,
   .btn-primary,
-  .btn-secondary {
-    padding: 8px 14px;
-    font-size: 12px;
+  .btn-secondary,
+  button {
+    min-height: 44px;
+    padding: 12px 14px;
+    font-size: 13px;
   }
-  
-  /* 输入框调整 */
+
+  /* 输入框调整 - 仍保持44px最小高度 */
   .input,
   .form-input,
-  .auth-input {
-    padding: 8px 12px;
-    font-size: 12px;
+  .auth-input,
+  input,
+  textarea,
+  select {
+    min-height: 44px;
+    padding: 12px 12px;
+    font-size: 13px;
   }
-  
+
   /* 文本调整 */
   p, span, div {
     font-size: 13px;

@@ -17,19 +17,15 @@ const getApiUrl = (envKey: string, fallback: string) => {
 // 项目API接口
 export const projectAPI = {
   /**
-   * 获取所有项目
+   * 获取所有项目（合并active和incoming）
    * @returns {Promise<ApiResponse>} 项目列表
    */
   async getAllProjects(status?: string): Promise<ApiResponse> {
     try {
       console.log('📊 API: 从数据库获取所有项目数据', { status })
 
-      // 构建URL，如果有状态参数则添加查询参数
-      let url = getApiUrl('VITE_API_PROJECT_URL', 'http://localhost:3000/api/project')
-      if (status && status !== 'all') {
-        url += `?status=${encodeURIComponent(status)}`
-      }
-      
+      // 使用新的合并查询端点
+      const url = getApiUrl('VITE_API_PROJECT_URL', 'http://localhost:3000/project/select')
       console.log('📊 API: 请求URL:', url)
 
       const response = await fetch(url, {
@@ -49,6 +45,78 @@ export const projectAPI = {
       return result
     } catch (error) {
       console.error('❌ API: 获取项目数据失败:', error)
+      return {
+        status: 1,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        data: []
+      }
+    }
+  },
+
+  /**
+   * 获取已代币化项目（project_active）
+   * @returns {Promise<ApiResponse>} 已代币化项目列表
+   */
+  async getActiveProjects(): Promise<ApiResponse> {
+    try {
+      console.log('📊 API: 获取已代币化项目（Tokenised RWA）')
+
+      const url = 'http://localhost:3000/project/active'
+      console.log('📊 API: 请求URL:', url)
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('📊 API: 数据库返回已代币化项目:', result)
+
+      return result
+    } catch (error) {
+      console.error('❌ API: 获取已代币化项目失败:', error)
+      return {
+        status: 1,
+        message: error instanceof Error ? error.message : 'Unknown error',
+        data: []
+      }
+    }
+  },
+
+  /**
+   * 获取待代币化项目（project_incoming）
+   * @returns {Promise<ApiResponse>} 待代币化项目列表
+   */
+  async getIncomingProjects(): Promise<ApiResponse> {
+    try {
+      console.log('📊 API: 获取待代币化项目（To Be Tokenised RWA）')
+
+      const url = 'http://localhost:3000/project/incoming'
+      console.log('📊 API: 请求URL:', url)
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
+      const result = await response.json()
+      console.log('📊 API: 数据库返回待代币化项目:', result)
+
+      return result
+    } catch (error) {
+      console.error('❌ API: 获取待代币化项目失败:', error)
       return {
         status: 1,
         message: error instanceof Error ? error.message : 'Unknown error',
@@ -460,6 +528,8 @@ export const productAPI = {
   ...projectAPI,
   // 添加向后兼容的方法名
   getAllProducts: projectAPI.getAllProjects,
+  getActiveProducts: projectAPI.getActiveProjects,
+  getIncomingProducts: projectAPI.getIncomingProjects,
   getProductByCode: projectAPI.getProjectByCode,
   updateProductSubscription: projectAPI.updateProjectSubscription
 }

@@ -38,14 +38,17 @@ const { expressjwt: expressJWT } = require('express-jwt')
 //导入路由模块
 const userRouter = require('./src/routers/userRouter')
 const transactionRouter = require('./src/routers/transactionRouter')
-const projectRouter = require('./src/routers/projectRouter')
+// 使用新版本的项目路由（支持project_active和project_incoming分离）
+const projectRouter = require('./src/routers/projectRouter_v2')
 const subscriptionRouter = require('./src/routers/subscriptionRouter')
+const contactRouter = require('./src/routers/ContactUs')
 
 // 使用路由模块
 app.use('/user', userRouter)
 app.use('/transaction', transactionRouter)
 app.use('/project', projectRouter)
 app.use('/api/subscriptions', subscriptionRouter)
+app.use('/api', contactRouter)
 
 // 定义全局错误级别中间件
 app.use((err, req, res, next) => {

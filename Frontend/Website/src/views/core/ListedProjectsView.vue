@@ -67,7 +67,7 @@
            
            <div class="pf-project-metric">
               <span class="pf-metric-label">{{ t('project.issuer') }}</span>
-              <span class="pf-metric-value">{{ p.issuer || 'TBA' }}</span>
+              <span class="pf-metric-value">{{ p.issuer || 'TBC' }}</span>
           </div>
           <div class="pf-project-metric">
              <span class="pf-metric-label">{{ t('project.interestRate') }}</span>
@@ -89,23 +89,23 @@
           <!-- <div class="pf-project-metrics pf-project-metrics-new"> -->
              <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.underlyingAsset') }}</span>
-               <span class="pf-metric-value">{{ p.collateral || 'TBA' }}</span>
+               <span class="pf-metric-value">{{ p.collateral || 'TBC' }}</span>
              </div>
              <!-- <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.sponsor') }}</span>
-               <span class="pf-metric-value">{{ p.sponsor || 'TBA' }}</span>
+               <span class="pf-metric-value">{{ p.sponsor || 'TBC' }}</span>
              </div> -->
              <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.valuer') }}</span>
-               <span class="pf-metric-value">{{ p.valuer || 'TBA' }}</span>
+               <span class="pf-metric-value">{{ p.valuer || 'TBC' }}</span>
              </div>
              <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.lawyer') }}</span>
-               <span class="pf-metric-value">{{ p.lawyer || 'TBA' }}</span>
+               <span class="pf-metric-value">{{ p.lawyer || 'TBC' }}</span>
              </div>
              <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.trustee') }}</span>
-               <span class="pf-metric-value">{{ p.trustee || 'TBA' }}</span>
+               <span class="pf-metric-value">{{ p.trustee || 'TBC' }}</span>
              </div>
           <!-- </div> -->
            
@@ -161,11 +161,11 @@ import { productAPI } from '@/service/api'
 import { useDatabaseSync } from '@/service/dataSyncService.js'
 import { useLanguage } from '@/composables/useLanguage'
 
-export default { 
+export default {
   name: 'ListedProjectsView',
   setup() {
-    const { t } = useLanguage()
-    return { t }
+    const { t, translateField, transformFields } = useLanguage()
+    return { t, translateField, transformFields }
   },
   props: {
     code: {
@@ -263,7 +263,7 @@ export default {
             propertySummary: rawData.property_type,
             
             // 贷款信息
-            mortgageType: rawData.mortage_type,
+            mortgageType: rawData.mortgage_type,
             loanAmount: rawData.loan_amount,
             loanTermMonths: rawData.loan_term_months,
             
@@ -297,7 +297,7 @@ export default {
             holderRegistry: rawData.Holder_Registry,
             
             // 前端显示字段
-            subtitle: `${rawData.mortage_type} - ${rawData.property_type}`,
+            subtitle: `${rawData.mortgage_type} - ${rawData.property_type}`,
             loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
             loanTermFormatted: `${rawData.loan_term_months} months`,
             targetYield: rawData.interest_rate,
@@ -374,7 +374,7 @@ export default {
             // 计算指标
             metrics: {
               currentElaraPrice: this.calculateTokenPrice(product),
-              collateralPropertyValue: product.valuation ? `${product.valuation.toLocaleString()}` : 'TBA',
+              collateralPropertyValue: product.valuation ? `${product.valuation.toLocaleString()}` : 'TBC',
               rentalIncome: this.calculateRentalIncome(product),
               targetLoanYield: `${product.targetYield}% p.a.`
             }
@@ -398,59 +398,63 @@ export default {
       try {
         this.loading = true
         this.error = null
-        console.log('🔄 从数据库加载产品数据...')
+        console.log('🔄 ListedProjectsView: 从数据库加载已代币化项目数据 (project_active)...')
 
-        const response = await productAPI.getAllProducts('ACTIVE')
+        // 使用新API: 只获取已代币化项目 (project_active表)
+        const response = await productAPI.getActiveProjects()
         
         if (response.status === 0) {
-          // 映射数据库字段到前端期望的字段名
+          // 映射数据库字段到前端期望的字段名，并应用字段翻译
           this.products = (response.data || []).map(project => {
+            // 先应用字段翻译（自动根据当前语言转换）
+            const translatedProject = this.transformFields(project)
+
             const mappedProduct = {
               // 基础信息
-              id: project.id,
-              code: project.project_code,
-              name: project.project_name,
-              status: project.loan_status || 'UNKNOWN',
-              
+              id: translatedProject.id,
+              code: translatedProject.project_code,
+              name: translatedProject.project_name,
+              status: translatedProject.status || 'ACTIVE',
+
               // 认购信息
-              totalOffering: this.formatNumber(project.total_offering_token),
-              subscribed: this.formatNumber(project.subscribe_token),
-              
+              totalOffering: this.formatNumber(translatedProject.total_offering_token),
+              subscribed: this.formatNumber(translatedProject.subscribe_token),
+
               // 原始数值用于计算
-              totalOfferingRaw: project.total_offering_token || 0,
-              subscribedRaw: project.subscribe_token || 0,
-              
-              // 物业信息
-              propertyLocation: project.property_location,
-              propertyState: project.property_state,
-              propertyType: project.property_type,
-              propertyValue: project.property_value,
-              propertySummary: project.property_type, // 使用property_type作为summary
-              
-              // 贷款信息
-              mortgageType: project.mortage_type,
-              loanAmount: project.loan_amount,
-              loanTermMonths: project.loan_term_months,
-              
+              totalOfferingRaw: translatedProject.total_offering_token || 0,
+              subscribedRaw: translatedProject.subscribe_token || 0,
+
+              // 物业信息 (已翻译)
+              propertyLocation: translatedProject.property_location,
+              propertyState: this.translateField('property_state', translatedProject.property_state),
+              propertyType: this.translateField('property_type', translatedProject.property_type),
+              propertyValue: translatedProject.property_value,
+              propertySummary: this.translateField('property_type', translatedProject.property_type),
+
+              // 贷款信息 (已翻译)
+              mortgageType: this.translateField('mortgage_type', translatedProject.mortgage_type),
+              loanAmount: translatedProject.loan_amount,
+              loanTermMonths: translatedProject.loan_term_months,
+
               // 贷款比率
-              lvr: project.lvr,
-              interestRate: project.interest_rate,
-              defaultRate: project.default_rate,
-              
+              lvr: translatedProject.lvr,
+              interestRate: translatedProject.interest_rate,
+              defaultRate: translatedProject.default_rate,
+
               // 贷款周期
-              commencementDate: project.commencement_date,
-              expiryDate: project.expiry_date,
-              expectedRecoveryDate: project.expected_recovery_date,
-              
-              // 相关主体信息
-              borrower: project.Borrower,
-              lender: project.Lender,
-              issuer: project.Issuer,
-              sponsor: project.Sponsor,
-              valuer: project.Valuer,
-              lawyer: project.Lawyer,
-              trustee: project.Trustee,
-              collateral: project.Collateral,
+              commencementDate: translatedProject.commencement_date,
+              expiryDate: translatedProject.expiry_date,
+              expectedRecoveryDate: translatedProject.expected_recovery_date,
+
+              // 相关主体信息 (已翻译)
+              borrower: this.translateField('borrower', translatedProject.borrower),
+              lender: translatedProject.lender,
+              issuer: translatedProject.issuer,
+              sponsor: translatedProject.sponsor,
+              valuer: translatedProject.valuer,
+              lawyer: translatedProject.lawyer,
+              trustee: translatedProject.trustee,
+              collateral: this.translateField('collateral', translatedProject.collateral),
               
               // 合约地址
               principalTokenAddress: project.principal_token_address,
@@ -462,7 +466,7 @@ export default {
               holderRegistry: project.Holder_Registry,
               
               // 前端显示字段
-              subtitle: `${project.mortage_type} - ${project.property_type}`,
+              subtitle: `${project.mortgage_type} - ${project.property_type}`,
               loanAmountFormatted: this.formatCurrency(project.loan_amount),
               loanTermFormatted: `${project.loan_term_months} months`,
               targetYield: project.interest_rate,
@@ -472,7 +476,7 @@ export default {
             // 添加计算指标
             mappedProduct.metrics = {
               currentElaraPrice: this.calculateTokenPrice(mappedProduct),
-              collateralPropertyValue: project.property_value ? `AUD${project.property_value.toLocaleString()}` : 'TBA',
+              collateralPropertyValue: project.property_value ? `AUD${project.property_value.toLocaleString()}` : 'TBC',
               rentalIncome: this.calculateRentalIncome(mappedProduct),
               targetLoanYield: `${project.interest_rate}% p.a.`
             }
@@ -536,7 +540,7 @@ export default {
           propertySummary: product.property_type,
           
           // 贷款信息
-          mortgageType: product.mortage_type,
+          mortgageType: product.mortgage_type,
           loanAmount: product.loan_amount,
           loanTermMonths: product.loan_term_months,
           lvr: product.lvr,
@@ -568,7 +572,7 @@ export default {
           holderRegistry: product.Holder_Registry,
           
           // 前端显示字段
-          subtitle: `${product.mortage_type} - ${product.property_type}`,
+          subtitle: `${product.mortgage_type} - ${product.property_type}`,
           loanAmountFormatted: product.loan_amount ? `AUD${product.loan_amount.toLocaleString()}` : 'AUD0',
           loanTermFormatted: `${product.loan_term_months} months`,
           targetYield: product.interest_rate,
@@ -756,7 +760,7 @@ export default {
     // 计算租金收入
     calculateRentalIncome(product) {
       // 基于房产价值和收益率估算租金收入
-      if (!product.valuation) return 'TBA'
+      if (!product.valuation) return 'TBC'
       
       const valuationStr = product.valuation.replace(/[AUD,]/g, '')
       const valuation = parseFloat(valuationStr)
@@ -875,7 +879,7 @@ export default {
           // 计算指标
           metrics: {
             currentElaraPrice: this.calculateTokenPrice(product),
-            collateralPropertyValue: product.valuation || 'TBA',
+            collateralPropertyValue: product.valuation || 'TBC',
             targetLoanYield: `${product.targetYield}% p.a.`
           },
           
@@ -896,11 +900,11 @@ export default {
           guarantor: product.guarantor,
           
           // 新增项目指标字段
-          underlyingAsset: product.collateral || 'TBA',
-          sponsor: product.sponsor || 'TBA',
-          valuer: product.valuer || 'TBA',
-          lawyer: product.lawyer || 'TBA',
-          trustee: product.trustee || 'TBA',
+          underlyingAsset: product.collateral || 'TBC',
+          sponsor: product.sponsor || 'TBC',
+          valuer: product.valuer || 'TBC',
+          lawyer: product.lawyer || 'TBC',
+          trustee: product.trustee || 'TBC',
           
           // Disbursement & Interest 放款和利息
           disbursementMethod: product.disbursementMethod,

@@ -1,4 +1,5 @@
 import { ref, computed } from 'vue'
+import { getFieldMapping, transformFieldValues, TRANSFORMABLE_FIELDS } from '../config/fieldMappings'
 
 // 语言状态管理
 const currentLanguage = ref('zh')
@@ -729,7 +730,7 @@ const translations = {
     'tobelisted.lawyer': '律师',
     'tobelisted.trustee': '监管方',
     'tobelisted.viewOnEtherscan': '在Etherscan上查看',
-    'tobelisted.tba': 'TBA'
+    'tobelisted.tba': 'TBC'
   },
   en: {
     // Common
@@ -1441,7 +1442,7 @@ const translations = {
     'tobelisted.lawyer': 'Lawyer',
     'tobelisted.trustee': 'Trustee',
     'tobelisted.viewOnEtherscan': 'View on Etherscan',
-    'tobelisted.tba': 'TBA'
+    'tobelisted.tba': 'TBC'
   }
 }
 
@@ -1513,6 +1514,16 @@ const initLanguage = () => {
   loadSavedLanguage()
 }
 
+// 字段映射函数（集成fieldMappings）
+const translateField = (fieldName, fieldValue) => {
+  return getFieldMapping(fieldName, fieldValue, currentLanguage.value)
+}
+
+// 批量转换对象字段
+const transformFields = (data) => {
+  return transformFieldValues(data, TRANSFORMABLE_FIELDS, currentLanguage.value)
+}
+
 export function useLanguage() {
   return {
     currentLanguage,
@@ -1521,6 +1532,10 @@ export function useLanguage() {
     getAvailableLanguages,
     initLanguage,
     applyLanguage,
-    t
+    t,
+    // 新增字段映射功能
+    translateField,
+    transformFields,
+    TRANSFORMABLE_FIELDS
   }
 }

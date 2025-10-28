@@ -260,7 +260,7 @@
           </svg>
         </button>
         <!-- <span class="sep"><--</span> -->
-        <span class="crumb">Projects</span>
+        <span class="crumb">{{ t('project.title') }}</span>
         <span class="sep">/</span>
         <span class="crumb-current">{{ projectCode }}</span>
       </nav>
@@ -310,31 +310,31 @@
               <div class="project-metrics">
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.issuer') }}</span>
-                  <span class="metric-value">{{ projectData?.issuer || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.issuer || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.estimateReturn') }}</span>
-                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.interestRate || 'N/A' }}% / {{ t('trade.year') }}</span>
+                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.interestRate || 'TBC' }}% / {{ t('trade.year') }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.tokenizedAmount') }}</span>
-                  <span class="metric-value">{{ projectData?.totalOffering || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.totalOffering || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.underlyingAsset') }}</span>
-                  <span class="metric-value">{{ projectData?.collateral || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.underlyingAsset ? translateField('collateral', projectData.underlyingAsset) : 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.valuer') }}</span>
-                  <span class="metric-value">{{ projectData?.valuer || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.valuer || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.lawyer') }}</span>
-                  <span class="metric-value">{{ projectData?.lawyer || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.lawyer || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.trustee') }}</span>
-                  <span class="metric-value">{{ projectData?.trustee || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.trustee || 'TBC' }}</span>
                 </div>
               </div>
             </div>
@@ -345,43 +345,43 @@
               <div class="project-metrics">
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.lender') }}</span>
-                  <span class="metric-value">{{ projectData?.lender || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.lender || 'TBC' }}</span>
                 </div>
                 <!-- <div class="metric-item">
                   <span class="metric-label">{{ t('trade.borrower') }}</span>
-                  <span class="metric-value">{{ projectData?.borrower || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.borrower || 'TBC' }}</span>
                 </div> -->
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.loanAmount') }}</span>
-                  <span class="metric-value">{{ projectData?.loanAmountFormatted || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.loanAmountFormatted || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.collateral') }}</span>
-                  <span class="metric-value">{{ projectData?.propertyType || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.propertyType ? translateField('property_type', projectData.propertyType) : 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.valuation') }}</span>
-                  <span class="metric-value">{{ projectData?.metrics?.collateralPropertyValue || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.metrics?.collateralPropertyValue || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.lvr') }}</span>
-                  <span class="metric-value">{{ projectData?.lvr || 'N/A' }}%</span>
+                  <span class="metric-value">{{ projectData?.lvr || 'TBC' }}%</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.mortgageTitle') }}</span>
-                  <span class="metric-value">{{ getMortgageType() || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.mortgageType ? translateField('mortgage_type', projectData.mortgageType) : 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.interestRate') }}</span>
-                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.interestRate || 'N/A' }}%</span>
+                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.interestRate || 'TBC' }}%</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.loanTerm') }}</span>
-                  <span class="metric-value">{{ projectData?.loanTermMonths || 'N/A' }} {{ t('trade.months') }}</span>
+                  <span class="metric-value">{{ projectData?.loanTermMonths || 'TBC' }} {{ t('trade.months') }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.defaultInterestRate') }}</span>
-                  <span class="metric-value">{{ projectData?.defaultRate || 'N/A' }}%</span>
+                  <span class="metric-value">{{ projectData?.defaultRate || 'TBC' }}%</span>
                 </div>
               </div>
             </div>
@@ -392,19 +392,19 @@
               <div class="project-metrics">
                 <!-- <div class="metric-item">
                   <span class="metric-label">{{ t('trade.assetAddress') }}</span>
-                  <span class="metric-value">{{ projectData?.propertyLocation || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.propertyLocation || 'TBC' }}</span>
                 </div> -->
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.siteArea') }}</span>
-                  <span class="metric-value">{{ projectData?.siteArea || 'N/A' }} {{ t('trade.squareMeters') }}</span>
+                  <span class="metric-value">{{ projectData?.siteArea || 'TBC' }} {{ projectData?.siteArea ? t('trade.squareMeters') : '' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.floorArea') }}</span>
-                  <span class="metric-value">{{ projectData?.floorArea || 'N/A' }} {{ t('trade.squareMeters') }}</span>
+                  <span class="metric-value">{{ projectData?.floorArea || 'TBC' }} {{ projectData?.floorArea ? t('trade.squareMeters') : '' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.propertyType') }}</span>
-                  <span class="metric-value">{{ projectData?.propertyType || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.propertyType ? translateField('property_type', projectData.propertyType) : 'TBC' }}</span>
                 </div>
               </div>
             </div>
@@ -415,19 +415,19 @@
               <div class="project-metrics">
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.underlyingAssetSize') }}</span>
-                  <span class="metric-value">{{ projectData?.loanAmountFormatted || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.loanAmountFormatted || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.totalTokenizedAmount') }}</span>
-                  <span class="metric-value">{{ projectData?.totalOffering || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.totalOffering || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.subscribedAmount') }}</span>
-                  <span class="metric-value">{{ projectData?.subscribed || 'N/A' }}</span>
+                  <span class="metric-value">{{ projectData?.subscribed || 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.subscriptionPercentage') }}</span>
-                  <span class="metric-value subscription-progress">{{ projectData?.subscriptionProgress?.toFixed(0) || 'N/A' }}%</span>
+                  <span class="metric-value subscription-progress">{{ projectData?.subscriptionProgress?.toFixed(0) || 'TBC' }}%</span>
                 </div>
               </div>
             </div>
@@ -627,8 +627,8 @@ import { getUserName, getUserEmail } from '@/service/userService'
 export default {
   name: 'TradeProjectView',
   setup() {
-    const { t } = useLanguage()
-    return { t }
+    const { t, translateField } = useLanguage()
+    return { t, translateField }
   },
   props: {
     code: {
@@ -931,21 +931,23 @@ export default {
             subscriptionProgress: this.calculateSubscriptionProgress(rawData),
             
             // 物业信息
-            propertyLocation: rawData.property_location,
-            propertyState: rawData.property_state,
-            propertyType: rawData.property_type,
-            propertyValue: rawData.property_value,
-            propertySummary: rawData.property_type,
-            
+            propertyLocation: rawData.property_location || 'TBC',
+            propertyState: rawData.property_state || 'TBC',
+            propertyType: rawData.property_type || 'TBC',
+            propertyValue: rawData.property_value || 0,
+            propertySummary: rawData.property_type || 'TBC',
+            siteArea: rawData.site_area || null,
+            floorArea: rawData.gross_floor_area || null,
+
             // 贷款信息
-            mortgageType: rawData.mortage_type,
-            loanAmount: rawData.loan_amount,
-            loanTermMonths: rawData.loan_term_months,
-            
+            mortgageType: rawData.mortgage_type || 'TBC',
+            loanAmount: rawData.loan_amount || 0,
+            loanTermMonths: rawData.loan_term_months || 0,
+
             // 贷款比率
-            lvr: rawData.lvr,
-            interestRate: rawData.interest_rate,
-            defaultRate: rawData.default_rate,
+            lvr: rawData.lvr || 0,
+            interestRate: rawData.interest_rate || 0,
+            defaultRate: rawData.default_interest_rate || 0,
             
             // 贷款周期
             commencementDate: rawData.commencement_date,
@@ -953,14 +955,15 @@ export default {
             expectedRecoveryDate: rawData.expected_recovery_date,
             
             // 相关主体信息
-            borrower: rawData.Borrower,
-            lender: rawData.Lender,
-            issuer: rawData.Issuer,
-            sponsor: rawData.Sponsor,
-            valuer: rawData.Valuer,
-            lawyer: rawData.Lawyer,
-            trustee: rawData.Trustee,
-            collateral: rawData.Collateral,
+            borrower: rawData.borrower || 'TBC',
+            lender: rawData.lender || 'TBC',
+            issuer: rawData.issuer || 'TBC',
+            sponsor: rawData.sponsor || 'TBC',
+            valuer: rawData.valuer || 'TBC',
+            lawyer: rawData.lawyer || 'TBC',
+            trustee: rawData.trustee || 'TBC',
+            collateral: rawData.collateral || 'TBC',
+            underlyingAsset: rawData.collateral || 'TBC',
             
             // 合约地址
             principalTokenAddress: rawData.principal_token_address,
@@ -972,7 +975,7 @@ export default {
             holderRegistry: rawData.Holder_Registry,
             
             // 前端显示字段
-            subtitle: `${rawData.mortage_type} - ${rawData.property_type}`,
+            subtitle: `${rawData.mortgage_type} - ${rawData.property_type}`,
             loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
             loanTermFormatted: `${rawData.loan_term_months} months`,
             targetYield: rawData.interest_rate,
@@ -982,11 +985,11 @@ export default {
             // 计算指标
             metrics: {
               currentElaraPrice: this.calculateTokenPrice(rawData),
-              collateralPropertyValue: rawData.property_value ? this.formatCurrency(rawData.property_value) : 'TBA',
+              collateralPropertyValue: rawData.property_value ? this.formatCurrency(rawData.property_value) : 'TBC',
               rentalIncome: this.calculateRentalIncome(rawData),
               targetLoanYield: `${rawData.interest_rate}% p.a.`,
-              loanToValue: rawData.lvr ? this.formatPercentage(rawData.lvr) : 'N/A',
-              defaultRate: rawData.default_rate ? this.formatPercentage(rawData.default_rate) : 'N/A'
+              loanToValue: rawData.lvr ? this.formatPercentage(rawData.lvr) : 'TBC',
+              defaultRate: rawData.default_interest_rate ? this.formatPercentage(rawData.default_interest_rate) : 'TBC'
             }
           }
           
@@ -1498,11 +1501,11 @@ export default {
     // 计算租金收入
     calculateRentalIncome(product) {
       // 基于房产价值和收益率估算租金收入
-      if (!product.propertyValue) return 'TBA'
-      
+      if (!product.propertyValue) return 'TBC'
+
       const valuationStr = product.propertyValue.toString().replace(/[AUD,]/g, '')
       const valuation = parseFloat(valuationStr)
-      if (isNaN(valuation)) return 'TBA'
+      if (isNaN(valuation)) return 'TBC'
       
       const monthlyYield = (product.targetYield || product.interestRate || 6.0) / 12 / 100
       const estimatedRental = valuation * monthlyYield
@@ -2856,67 +2859,203 @@ export default {
 
 /* 移除通知样式已删除 */
 
-/* 响应式设计 */
+/* 响应式设计 - 统一断点策略 */
+
+/* 平板横屏 - 1024px */
+@media (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .trade-form-card {
+    position: static;
+    top: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .project-metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* 平板竖屏 - 768px */
 @media (max-width: 768px) {
   .container {
     padding: 16px;
   }
-  
+
   .main-content {
     padding: 20px 0;
     gap: 20px;
   }
-  
+
   .main-layout {
     grid-template-columns: 1fr;
     gap: 24px;
   }
-  
+
   .project-header {
     flex-direction: column;
+    align-items: flex-start;
   }
-  
+
   .project-title-row {
     justify-content: flex-start;
     text-align: left;
+    width: 100%;
   }
 
   .project-metrics-container {
     gap: 16px;
   }
-  
+
   .metrics-section {
     padding: 16px;
   }
-  
+
   .metrics-section-title {
     font-size: 16px;
   }
-  
+
   .project-metrics {
     grid-template-columns: 1fr;
+    gap: 12px;
   }
-  
+
+  .metric-item {
+    padding: 12px;
+  }
+
+  .metric-label {
+    font-size: 13px;
+  }
+
+  .metric-value {
+    font-size: 14px;
+  }
+
   .contract-addresses-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .contract-address-value {
     font-size: 12px;
     padding: 6px 10px;
   }
-  
+
   .form-header {
-  flex-direction: column;
+    flex-direction: column;
     align-items: stretch;
   }
-  
+
   .wallet-status-inline {
-  justify-content: center;
+    justify-content: center;
   }
-  
+
   .success-actions {
-  flex-direction: column;
+    flex-direction: column;
+  }
+
+  /* 确保按钮触摸友好 */
+  .btn, button {
+    min-height: 44px;
+    padding: 12px 20px;
+  }
+}
+
+/* 大手机 - 640px */
+@media (max-width: 640px) {
+  .container {
+    padding: 12px;
+  }
+
+  .breadcrumb {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .crumb, .crumb-current {
+    font-size: 13px;
+  }
+
+  .metrics-section {
+    padding: 12px;
+  }
+
+  .metrics-section-title {
+    font-size: 15px;
+    margin-bottom: 12px;
+  }
+
+  .metric-label {
+    font-size: 12px;
+  }
+
+  .metric-value {
+    font-size: 13px;
+  }
+
+  .trade-form-card {
+    padding: 16px;
+  }
+
+  .form-group label {
+    font-size: 13px;
+  }
+
+  .form-input {
+    font-size: 14px;
+    padding: 10px 12px;
+  }
+}
+
+/* 中小手机 - 480px */
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .main-content {
+    padding: 16px 0;
+    gap: 16px;
+  }
+
+  .project-info-card,
+  .trade-form-card {
+    padding: 12px;
+  }
+
+  .metrics-section {
+    padding: 10px;
+  }
+
+  .project-metrics {
+    gap: 10px;
+  }
+
+  .metric-item {
+    padding: 10px;
+  }
+
+  h1 {
+    font-size: 20px;
+  }
+
+  h2, h3 {
+    font-size: 16px;
+  }
+
+  /* 确保所有按钮和输入框满足最小触摸目标 */
+  .btn, button, .form-input, .pf-project-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .pf-project-btn {
+    padding: 12px 16px;
+    font-size: 14px;
   }
 }
 

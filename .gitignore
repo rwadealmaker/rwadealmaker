@@ -119,3 +119,14 @@ Frontend/Website/dist/
 # Temporary files
 tmp/
 temp/
+nul
+**/nul
+
+# Claude AI
+.claude/
+
+# Test files
+**/test_*.js
+**/test-*.js
+**/test_*.html
+**/test-*.html
