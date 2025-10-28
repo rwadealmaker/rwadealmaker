@@ -51,7 +51,31 @@ app.use('/api', contactRouter);
 
 // 健康检查端点
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend API is running on Vercel' });
+  res.json({
+    status: 'ok',
+    message: 'Backend API is running on Vercel',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// 环境变量检查端点（仅用于测试，生产环境应删除）
+app.get('/api/env-check', (req, res) => {
+  res.json({
+    database: {
+      host: process.env.db_host ? '✅ Configured' : '❌ Missing',
+      port: process.env.db_port ? '✅ Configured' : '❌ Missing',
+      user: process.env.db_user ? '✅ Configured' : '❌ Missing',
+      password: process.env.db_password ? '✅ Configured' : '❌ Missing',
+      name: process.env.db_name ? '✅ Configured' : '❌ Missing'
+    },
+    email: {
+      host: process.env.EMAIL_HOST ? '✅ Configured' : '❌ Missing',
+      port: process.env.EMAIL_PORT ? '✅ Configured' : '❌ Missing',
+      user: process.env.EMAIL_USER ? '✅ Configured' : '❌ Missing',
+      password: process.env.EMAIL_PASSWORD ? '✅ Configured' : '❌ Missing'
+    },
+    nodeEnv: process.env.NODE_ENV || 'development'
+  });
 });
 
 // 定义全局错误级别中间件
