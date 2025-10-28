@@ -2,15 +2,15 @@
   "version": 2,
   "builds": [
     {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    },
+    {
       "src": "Frontend/Website/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist"
+        "distDir": "Frontend/Website/dist"
       }
-    },
-    {
-      "src": "api/index.js",
-      "use": "@vercel/node"
     }
   ],
   "routes": [
@@ -31,11 +31,11 @@
       "dest": "/api/index.js"
     },
     {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/Frontend/Website/dist/$1"
+      "dest": "/Frontend/Website/dist/index.html"
     }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  }
+  ]
 }
