@@ -1,0 +1,22 @@
+{
+  "name": "rwadealmaker",
+  "version": "1.0.0",
+  "description": "RWA Deal Maker - Real World Asset Investment Platform",
+  "scripts": {
+    "build": "cd Frontend/Website && npm install && npm run build",
+    "dev": "concurrently \"cd Backend && npm run dev\" \"cd Frontend/Website && npm run dev\""
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "mysql2": "^3.14.5",
+    "dotenv": "^17.2.2",
+    "nodemailer": "^7.0.6",
+    "joi": "^17.13.3",
+    "express-jwt": "^8.4.1",
+    "body-parser": "^2.2.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
