@@ -2,14 +2,26 @@
   "buildCommand": "cd Frontend/Website && npm run build",
   "outputDirectory": "Frontend/Website/dist",
   "installCommand": "npm install --prefix api && npm install --prefix Frontend/Website",
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "src": "/api/project/(.*)",
+      "dest": "/api/project.js"
     },
     {
-      "source": "/(.*)",
-      "destination": "/index.html"
+      "src": "/api/subscription/(.*)",
+      "dest": "/api/subscription.js"
+    },
+    {
+      "src": "/api/user/(.*)",
+      "dest": "/api/user.js"
+    },
+    {
+      "src": "/api/contact",
+      "dest": "/api/contact.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
     }
   ]
 }
