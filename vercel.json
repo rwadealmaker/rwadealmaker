@@ -1,11 +1,39 @@
 {
-  "buildCommand": "cd Frontend/Website && npm install && npm run build",
-  "outputDirectory": "Frontend/Website/dist",
-  "installCommand": "cd Frontend/Website && npm install",
+  "version": 2,
+  "builds": [
+    {
+      "src": "Frontend/Website/package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/Frontend/Website/dist/$1"
+    }
+  ],
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
+    },
+    {
+      "source": "/((?!api).*)",
       "destination": "/index.html"
     }
-  ]
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  }
 }

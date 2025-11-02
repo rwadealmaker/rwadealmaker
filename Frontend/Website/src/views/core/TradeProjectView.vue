@@ -1179,9 +1179,9 @@ export default {
         
         // ⚠️ 重要：这是后端API服务器地址，不是数据库地址
         // 端口应该是3000（后端API端口），不是3306（MySQL数据库端口）
-        const apiUrl = 'http://localhost:3000'
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
         if (!apiUrl) {
-          throw new Error('远程API地址未配置，请设置VUE_APP_API_URL环境变量')
+          throw new Error('远程API地址未配置，请设置VITE_API_BASE_URL环境变量')
         }
         
         const endpoint = `${apiUrl}/api/subscriptions`

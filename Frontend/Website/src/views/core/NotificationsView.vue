@@ -223,7 +223,7 @@ const loadNotifications = async () => {
     }
     
     try {
-      const apiUrl = 'http://localhost:3000'
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
       const params = new URLSearchParams()
       if (userWallet) params.append('user_wallet_address', userWallet)
       if (userId) params.append('user_id', userId)
@@ -593,7 +593,7 @@ const markAsRead = async (notificationId) => {
     
     // 调用API标记为已读
     try {
-      const apiUrl = 'http://localhost:3000'
+      const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
       const response = await fetch(`${apiUrl}/api/subscriptions/notifications/${notificationId}/read`, {
         method: 'PATCH',
         headers: {
@@ -663,7 +663,7 @@ const clearAllNotifications = async () => {
       const userId = localStorage.getItem('userId')
       
       if (userWallet || userId) {
-        const apiUrl = 'http://localhost:3000'
+        const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
         const params = new URLSearchParams()
         if (userWallet) params.append('user_wallet_address', userWallet)
         if (userId) params.append('user_id', userId)
@@ -733,7 +733,7 @@ const handlePaymentNotification = async (notification) => {
       : notification.payload
     
     // 获取认购详情
-    const apiUrl = 'http://localhost:3000'
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
     const response = await fetch(`${apiUrl}/api/subscriptions/${notification.subscription_id}`)
     
     if (!response.ok) {
@@ -831,7 +831,7 @@ const initiatePayment = async (subscription) => {
 // 提交支付哈希到后端
 const submitPaymentHash = async (subscriptionId, txHash, userAddress) => {
   try {
-    const apiUrl = 'http://localhost:3000'
+    const apiUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
     const response = await fetch(`${apiUrl}/api/subscriptions/${subscriptionId}/payment`, {
       method: 'POST',
       headers: {

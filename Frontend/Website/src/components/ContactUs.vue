@@ -167,7 +167,8 @@ export default {
       
       try {
         // 发送到后端API
-        const response = await fetch('http://localhost:3000/api/contact', {
+        const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
+        const response = await fetch(`${API_URL}/api/contact`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

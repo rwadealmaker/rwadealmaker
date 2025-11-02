@@ -1,17 +1,11 @@
 // api.ts - API服务接口
+import API_CONFIG, { getProjectByCodeUrl, getProjectContractsUrl, getProjectSubscriptionUrl } from '../config/env'
 
 // API响应结构
 interface ApiResponse<T = any> {
   status: number
   message?: string
   data?: T
-}
-
-// API完整URL配置 - 直接从环境变量获取完整URL
-const getApiUrl = (envKey: string, fallback: string) => {
-  const envValue = (import.meta as any).env[envKey]
-  console.log(`🔍 API配置: ${envKey} = ${envValue || '未设置'}`)
-  return envValue || fallback
 }
 
 // 项目API接口
@@ -25,7 +19,7 @@ export const projectAPI = {
       console.log('📊 API: 从数据库获取所有项目数据', { status })
 
       // 使用新的合并查询端点
-      const url = getApiUrl('VITE_API_PROJECT_URL', 'http://localhost:3000/project/select')
+      const url = API_CONFIG.PROJECT_SELECT
       console.log('📊 API: 请求URL:', url)
 
       const response = await fetch(url, {
@@ -61,7 +55,7 @@ export const projectAPI = {
     try {
       console.log('📊 API: 获取已代币化项目（Tokenised RWA）')
 
-      const url = 'http://localhost:3000/project/active'
+      const url = API_CONFIG.PROJECT_ACTIVE
       console.log('📊 API: 请求URL:', url)
 
       const response = await fetch(url, {
@@ -97,7 +91,7 @@ export const projectAPI = {
     try {
       console.log('📊 API: 获取待代币化项目（To Be Tokenised RWA）')
 
-      const url = 'http://localhost:3000/project/incoming'
+      const url = API_CONFIG.PROJECT_INCOMING
       console.log('📊 API: 请求URL:', url)
 
       const response = await fetch(url, {
@@ -134,7 +128,7 @@ export const projectAPI = {
     try {
       console.log('📊 API: 从数据库根据代码获取项目:', code)
 
-      const url = `${getApiUrl('VITE_API_PROJECT_BY_CODE_URL', 'http://localhost:3000/project/select')}/${code}`
+      const url = getProjectByCodeUrl(code)
       console.log('📊 API: 请求项目详情URL:', url)
       
       const response = await fetch(url, {
@@ -171,7 +165,7 @@ export const projectAPI = {
     try {
       console.log('📊 API: 获取项目合约地址:', projectCode)
 
-      const response = await fetch(`${getApiUrl('VITE_API_PROJECT_URL', 'http://localhost:3000/api/project')}/${projectCode}/contracts`, {
+      const response = await fetch(getProjectContractsUrl(projectCode), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -348,7 +342,7 @@ export const projectAPI = {
         subscribe_token: subscriptionData.subscribed || subscriptionData.subscribe_token
       }
 
-      const response = await fetch(`${getApiUrl('VITE_API_PROJECT_SUBSCRIPTION_URL', 'http://localhost:3000/api/loans')}/${code}/subscription`, {
+      const response = await fetch(getProjectSubscriptionUrl(code), {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -421,7 +415,7 @@ export const userAPI = {
         throw new Error('未找到认证token')
       }
 
-      const response = await fetch(getApiUrl('VITE_API_USER_URL', 'http://localhost:3000/user'), {
+      const response = await fetch(API_CONFIG.USER_BASE, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -455,7 +449,7 @@ export const login = async (email: string, password: string): Promise<ApiRespons
   try {
     console.log('🔐 API: 用户登录:', email)
 
-    const response = await fetch(getApiUrl('VITE_API_LOGIN_URL', 'http://localhost:3000/user/login'), {
+    const response = await fetch(API_CONFIG.USER_LOGIN, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -491,7 +485,7 @@ export const signup = async (userData: any): Promise<ApiResponse> => {
   try {
     console.log('📝 API: 用户注册:', userData)
 
-    const response = await fetch(getApiUrl('VITE_API_REGISTER_URL', 'http://localhost:3000/user/reguser'), {
+    const response = await fetch(API_CONFIG.USER_REGISTER, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -545,7 +539,7 @@ export const transactionAPI = {
     try {
       console.log('💾 TransactionAPI: 保存交易历史', transactionData)
 
-      const response = await fetch(getApiUrl('VITE_API_TRANSACTION_URL', 'http://localhost:3000/api/transaction'), {
+      const response = await fetch(API_CONFIG.TRANSACTION_BASE, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -587,7 +581,7 @@ export const transactionAPI = {
       if (params.limit) queryParams.append('limit', params.limit.toString())
       if (params.offset) queryParams.append('offset', params.offset.toString())
 
-      const url = `${getApiUrl('VITE_API_TRANSACTION_URL', 'http://localhost:3000/transaction')}?${queryParams.toString()}`
+      const url = `${API_CONFIG.TRANSACTION_BASE}?${queryParams.toString()}`
 
       const response = await fetch(url, {
         method: 'GET',
@@ -623,7 +617,7 @@ export const transactionAPI = {
     try {
       console.log('TransactionAPI: 部署智能合约', contractData)
 
-      const response = await fetch(getApiUrl('VITE_API_PROJECT_URL', 'http://localhost:3000/api/project') + '/deploy-contracts', {
+      const response = await fetch(API_CONFIG.PROJECT_DEPLOY_CONTRACTS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
