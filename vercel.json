@@ -1,17 +1,7 @@
 {
   "buildCommand": "cd Frontend/Website && npm install && npm run build",
   "outputDirectory": "Frontend/Website/dist",
-  "installCommand": "npm install --prefix Frontend/Website && npm install --prefix api",
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    },
     {
       "source": "/(.*)",
       "destination": "/index.html"
