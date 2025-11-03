@@ -15,14 +15,26 @@ module.exports = async (req, res) => {
   try {
     // GET /api/project/select - 获取所有项目
     if (pathname === '/api/project/select' && method === 'GET') {
-      const sql = `
-        SELECT *, 'active' as source FROM project_active
-        UNION ALL
-        SELECT *, 'incoming' as source FROM project_incoming
-        ORDER BY created_at DESC
-      `
-      const results = await query(sql, [])
-      return success(res, results, 'Projects retrieved successfully')
+      console.log('🔍 [API] 查询所有项目')
+
+      try {
+        // 分别查询两个表，然后合并
+        const activeSql = `SELECT *, 'active' as source FROM project_active ORDER BY created_at DESC`
+        const incomingSql = `SELECT *, 'incoming' as source FROM project_incoming ORDER BY created_at DESC`
+
+        const activeResults = await query(activeSql, [])
+        const incomingResults = await query(incomingSql, [])
+
+        // 合并结果
+        const results = [...activeResults, ...incomingResults]
+
+        console.log(`✅ [API] 返回 ${activeResults.length} 个 active 项目, ${incomingResults.length} 个 incoming 项目`)
+        return success(res, results, 'Projects retrieved successfully')
+
+      } catch (err) {
+        console.error('❌ [API] 查询所有项目失败:', err.message)
+        throw err
+      }
     }
 
     // GET /api/project/active - 获取已代币化项目
@@ -43,39 +55,69 @@ module.exports = async (req, res) => {
     const selectCodeMatch = pathname.match(/^\/api\/project\/select\/([^\/]+)$/)
     if (selectCodeMatch && method === 'GET') {
       const code = selectCodeMatch[1]
-      const sql = `
-        SELECT *, 'active' as source FROM project_active WHERE code = $1
-        UNION ALL
-        SELECT *, 'incoming' as source FROM project_incoming WHERE code = $1
-        LIMIT 1
-      `
-      const results = await query(sql, [code])
-      
-      if (results.length === 0) {
-        return error(res, 'Project not found', 404)
-      }
+      console.log(`🔍 [API] 查询项目: ${code}`)
 
-      return success(res, results[0], 'Project retrieved successfully')
+      try {
+        // 先尝试在 active 表中查找
+        const activeSql = `
+          SELECT *, 'active' as source
+          FROM project_active
+          WHERE project_code = $1
+          LIMIT 1
+        `
+        let results = await query(activeSql, [code])
+
+        // 如果没找到，再尝试 incoming 表
+        if (results.length === 0) {
+          console.log(`⚠️  [API] 在 project_active 中未找到 ${code}，尝试 project_incoming`)
+          const incomingSql = `
+            SELECT *, 'incoming' as source
+            FROM project_incoming
+            WHERE project_code = $1
+            LIMIT 1
+          `
+          results = await query(incomingSql, [code])
+        } else {
+          console.log(`✅ [API] 在 project_active 中找到 ${code}`)
+        }
+
+        if (results.length === 0) {
+          console.log(`❌ [API] 项目不存在: ${code}`)
+          return error(res, 'Project not found', 404)
+        }
+
+        console.log(`✅ [API] 成功返回项目 ${code}`)
+        return success(res, results[0], 'Project retrieved successfully')
+
+      } catch (err) {
+        console.error(`❌ [API] 查询项目 ${code} 失败:`, err.message)
+        throw err
+      }
     }
 
     // GET /api/project/:code/contracts - 获取项目合约地址
     const contractsMatch = pathname.match(/^\/api\/project\/([^\/]+)\/contracts$/)
     if (contractsMatch && method === 'GET') {
       const code = contractsMatch[1]
+      console.log(`🔍 [API] 查询项目合约: ${code}`)
+
       const sql = `
-        SELECT 
-          contract_address_token,
-          contract_address_kyc,
-          contract_address_loan
-        FROM project_active 
-        WHERE code = $1
+        SELECT
+          principal_token_address,
+          interest_token_address,
+          loan_issuer_address,
+          kyc_registry_address
+        FROM project_active
+        WHERE project_code = $1
       `
       const results = await query(sql, [code])
 
       if (results.length === 0) {
+        console.log(`❌ [API] 项目合约不存在: ${code}`)
         return error(res, 'Project contracts not found', 404)
       }
 
+      console.log(`✅ [API] 成功返回项目合约 ${code}`)
       return success(res, results[0], 'Contracts retrieved successfully')
     }
 
