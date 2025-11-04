@@ -313,15 +313,25 @@ export const FIELD_MAPPINGS = {
  * @returns {string} 映射后的显示值
  */
 export function getFieldMapping(fieldName, fieldValue, language = 'en') {
+  console.log('🔍 getFieldMapping called:', { fieldName, fieldValue, language })
+
   if (!fieldValue) return fieldValue || 'N/A'
 
   const fieldMap = FIELD_MAPPINGS[fieldName]
-  if (!fieldMap) return fieldValue
+  if (!fieldMap) {
+    console.log('⚠️  No field map found for:', fieldName)
+    return fieldValue
+  }
 
   const langMap = fieldMap[language]
-  if (!langMap) return fieldValue
+  if (!langMap) {
+    console.log('⚠️  No language map found for:', language)
+    return fieldValue
+  }
 
-  return langMap[fieldValue] || fieldValue
+  const result = langMap[fieldValue] || fieldValue
+  console.log('✅ Translation result:', result)
+  return result
 }
 
 /**
