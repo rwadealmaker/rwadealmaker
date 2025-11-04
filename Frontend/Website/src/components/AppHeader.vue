@@ -340,21 +340,26 @@ export default {
     },
 
     onDocClick(e){
+      // 检查 $el 是否是有效的 DOM 元素
+      if (!this.$el || typeof this.$el.querySelector !== 'function') {
+        return
+      }
+
       const dropdown = this.$el.querySelector('.dropdown-container')
       const mobileMenuBtn = this.$el.querySelector('.mobile-menu-btn')
       const mobileMenu = this.$el.querySelector('.mobile-menu')
       const walletDropdown = this.$el.querySelector('.wallet-dropdown-container')
-      
+
       // 处理dropdown点击外部关闭
       if(dropdown && this.moreDropdownOpen && !dropdown.contains(e.target)){
         this.closeMoreDropdown()
       }
-      
+
       // 处理钱包下拉菜单点击外部关闭
       if(walletDropdown && this.walletDropdownOpen && !walletDropdown.contains(e.target)){
         this.hideWalletDropdown()
       }
-      
+
       // 处理移动端菜单点击外部关闭
       if(mobileMenu && this.mobileMenuOpen && !mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)){
         this.closeMobileMenu()

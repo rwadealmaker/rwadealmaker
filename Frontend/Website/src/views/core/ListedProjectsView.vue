@@ -89,7 +89,7 @@
           <!-- <div class="pf-project-metrics pf-project-metrics-new"> -->
              <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.underlyingAsset') }}</span>
-               <span class="pf-metric-value">{{ p.collateral || 'TBC' }}</span>
+               <span class="pf-metric-value">{{ translateField('collateral', p.collateral) || 'TBC' }}</span>
              </div>
              <!-- <div class="pf-project-metric">
                <span class="pf-metric-label">{{ t('project.sponsor') }}</span>
