@@ -373,7 +373,7 @@
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.interestRate') }}</span>
-                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.interestRate || 'TBC' }}%</span>
+                  <span class="metric-value" style="color: #16a34a;">{{ projectData?.underlyingInterestRate || 'TBC' }}%</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.loanTerm') }}</span>
@@ -946,7 +946,9 @@ export default {
 
             // 贷款比率
             lvr: rawData.lvr || 0,
-            interestRate: rawData.interest_rate || 0,
+            estimatedReturn: rawData.estimated_return || 0,  // 给投资人的Token收益率
+            underlyingInterestRate: rawData.interest_rate || 0,  // 底层资产的实际收益率
+            interestRate: rawData.estimated_return || 0,  // 兼容旧代码，显示给投资人的收益率
             defaultRate: rawData.default_interest_rate || 0,
             
             // 贷款周期
@@ -978,7 +980,7 @@ export default {
             subtitle: `${rawData.mortgage_type} - ${rawData.property_type}`,
             loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
             loanTermFormatted: `${rawData.loan_term_months} months`,
-            targetYield: rawData.interest_rate,
+            targetYield: rawData.estimated_return,  // 使用给投资人的收益率
             valuation: rawData.property_value,
             image: rawData.image || this.getProductImage(rawData.project_code),
 
@@ -987,7 +989,7 @@ export default {
               currentElaraPrice: this.calculateTokenPrice(rawData),
               collateralPropertyValue: rawData.property_value ? this.formatCurrency(rawData.property_value) : 'TBC',
               rentalIncome: this.calculateRentalIncome(rawData),
-              targetLoanYield: `${rawData.interest_rate}% p.a.`,
+              targetLoanYield: `${rawData.estimated_return}% p.a.`,  // 使用给投资人的收益率
               loanToValue: rawData.lvr ? this.formatPercentage(rawData.lvr) : 'TBC',
               defaultRate: rawData.default_interest_rate ? this.formatPercentage(rawData.default_interest_rate) : 'TBC'
             }

@@ -438,7 +438,7 @@ export default {
 
               // 贷款比率
               lvr: translatedProject.lvr,
-              interestRate: translatedProject.interest_rate,
+              interestRate: translatedProject.estimated_return,
               defaultRate: translatedProject.default_rate,
 
               // 贷款周期

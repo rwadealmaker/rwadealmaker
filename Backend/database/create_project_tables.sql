@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `project_active` (
 
   -- 贷款基本信息 (全部英文)
   `loan_amount` DECIMAL(20, 2) COMMENT '贷款金额',
-  `interest_rate` DECIMAL(5, 2) COMMENT '年利率 (%)',
+  `interest_rate` DECIMAL(5, 2) COMMENT '底层资产年利率 (%) - 底层资产的实际收益率',
+  `estimated_return` DECIMAL(5, 2) COMMENT '预期收益率 (%) - 给投资人的Token收益率',
   `loan_term_months` INT COMMENT '贷款期限 (月)',
   `lvr` DECIMAL(5, 2) COMMENT '贷款价值比 (LVR %)',
 
