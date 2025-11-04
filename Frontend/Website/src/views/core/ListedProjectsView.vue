@@ -300,7 +300,7 @@ export default {
             subtitle: `${rawData.mortgage_type} - ${rawData.property_type}`,
             loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
             loanTermFormatted: `${rawData.loan_term_months} months`,
-            targetYield: rawData.interest_rate,
+            targetYield: rawData.estimated_return,
             valuation: rawData.property_value,
             
             // 原始数值用于计算
@@ -469,16 +469,16 @@ export default {
               subtitle: `${project.mortgage_type} - ${project.property_type}`,
               loanAmountFormatted: this.formatCurrency(project.loan_amount),
               loanTermFormatted: `${project.loan_term_months} months`,
-              targetYield: project.interest_rate,
+              targetYield: project.estimated_return,
               image: project.image || this.getProductImage(project.project_code)
             }
-            
+
             // 添加计算指标
             mappedProduct.metrics = {
               currentElaraPrice: this.calculateTokenPrice(mappedProduct),
               collateralPropertyValue: project.property_value ? `AUD${project.property_value.toLocaleString()}` : 'TBC',
               rentalIncome: this.calculateRentalIncome(mappedProduct),
-              targetLoanYield: `${project.interest_rate}% p.a.`
+              targetLoanYield: `${project.estimated_return}% p.a.`
             }
             
             return mappedProduct
@@ -575,7 +575,7 @@ export default {
           subtitle: `${product.mortgage_type} - ${product.property_type}`,
           loanAmountFormatted: product.loan_amount ? `AUD${product.loan_amount.toLocaleString()}` : 'AUD0',
           loanTermFormatted: `${product.loan_term_months} months`,
-          targetYield: product.interest_rate,
+          targetYield: product.estimated_return,
           image: product.image || this.getProductImage(product.project_code)
         }))
         this.lastRefreshTime = new Date()

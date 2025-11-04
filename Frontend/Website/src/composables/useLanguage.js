@@ -981,7 +981,7 @@ const translations = {
     'project.invest': 'Invest',
     'project.trade': 'Trade',
     'project.loanAmount': 'Loan Amount',
-    'project.interestRate': 'Expected Yield',
+    'project.interestRate': 'Estimate Return',
     'project.perYear': ' p.a.',
     'project.loanTerm': 'Loan Term',
     'project.months': ' Months',
