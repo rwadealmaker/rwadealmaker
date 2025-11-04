@@ -329,7 +329,24 @@ export function getFieldMapping(fieldName, fieldValue, language = 'en') {
     return fieldValue
   }
 
-  const result = langMap[fieldValue] || fieldValue
+  // 直接查找
+  let result = langMap[fieldValue]
+
+  // 如果没找到，尝试反向查找（值可能是其他语言的翻译结果）
+  if (!result) {
+    console.log('🔄 Direct lookup failed, trying reverse lookup...')
+    // 遍历所有语言，找到匹配的值，然后返回目标语言的翻译
+    for (const [lang, translations] of Object.entries(fieldMap)) {
+      const matchedKey = Object.keys(translations).find(key => translations[key] === fieldValue)
+      if (matchedKey) {
+        result = langMap[matchedKey]
+        console.log(`✅ Found via reverse lookup: ${fieldValue} (${lang}) -> ${matchedKey} -> ${result} (${language})`)
+        break
+      }
+    }
+  }
+
+  result = result || fieldValue
   console.log('✅ Translation result:', result)
   return result
 }
