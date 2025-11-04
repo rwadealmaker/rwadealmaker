@@ -390,10 +390,10 @@
             <div class="metrics-section">
               <h3 class="metrics-section-title">{{ t('trade.collateralInfo') }}</h3>
               <div class="project-metrics">
-                <!-- <div class="metric-item">
+                <div class="metric-item">
                   <span class="metric-label">{{ t('trade.assetAddress') }}</span>
                   <span class="metric-value">{{ projectData?.propertyLocation || 'TBC' }}</span>
-                </div> -->
+                </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.siteArea') }}</span>
                   <span class="metric-value">{{ projectData?.siteArea || 'TBC' }} {{ projectData?.siteArea ? t('trade.squareMeters') : '' }}</span>
