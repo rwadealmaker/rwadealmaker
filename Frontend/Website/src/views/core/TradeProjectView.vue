@@ -357,7 +357,7 @@
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.collateral') }}</span>
-                  <span class="metric-value">{{ projectData?.propertyType ? translateField('property_type', projectData.propertyType) : 'TBC' }}</span>
+                  <span class="metric-value">{{ projectData?.collateral ? translateField('collateral', projectData.collateral) : 'TBC' }}</span>
                 </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.valuation') }}</span>
