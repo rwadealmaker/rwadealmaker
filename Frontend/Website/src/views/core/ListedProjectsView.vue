@@ -269,7 +269,7 @@ export default {
             
             // 贷款比率
             lvr: rawData.lvr,
-            interestRate: rawData.interest_rate,
+            interestRate: rawData.estimated_return,
             defaultRate: rawData.default_rate,
             
             // 贷款周期
@@ -544,7 +544,7 @@ export default {
           loanAmount: product.loan_amount,
           loanTermMonths: product.loan_term_months,
           lvr: product.lvr,
-          interestRate: product.interest_rate,
+          interestRate: product.estimated_return,
           defaultRate: product.default_rate,
           
           // 贷款周期

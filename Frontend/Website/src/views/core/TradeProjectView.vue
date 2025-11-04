@@ -946,7 +946,7 @@ export default {
 
             // 贷款比率
             lvr: rawData.lvr || 0,
-            interestRate: rawData.estimated_return || 0,
+            interestRate: rawData.interest_rate || 0,
             defaultRate: rawData.default_interest_rate || 0,
             
             // 贷款周期
@@ -978,7 +978,7 @@ export default {
             subtitle: `${rawData.mortgage_type} - ${rawData.property_type}`,
             loanAmountFormatted: this.formatCurrency(rawData.loan_amount),
             loanTermFormatted: `${rawData.loan_term_months} months`,
-            targetYield: rawData.estimated_return,
+            targetYield: rawData.interest_rate,
             valuation: rawData.property_value,
             image: rawData.image || this.getProductImage(rawData.project_code),
 
@@ -987,7 +987,7 @@ export default {
               currentElaraPrice: this.calculateTokenPrice(rawData),
               collateralPropertyValue: rawData.property_value ? this.formatCurrency(rawData.property_value) : 'TBC',
               rentalIncome: this.calculateRentalIncome(rawData),
-              targetLoanYield: `${rawData.estimated_return}% p.a.`,
+              targetLoanYield: `${rawData.interest_rate}% p.a.`,
               loanToValue: rawData.lvr ? this.formatPercentage(rawData.lvr) : 'TBC',
               defaultRate: rawData.default_interest_rate ? this.formatPercentage(rawData.default_interest_rate) : 'TBC'
             }
