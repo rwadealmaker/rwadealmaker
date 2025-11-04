@@ -87,7 +87,7 @@ export const FIELD_MAPPINGS = {
       'Strata Title': 'Strata Title',
       'Freehold': 'Freehold',
       'Leasehold': 'Leasehold',
-      'Australian Residential Security': 'Australian Residential Security',
+      'Australian Residential Mortgage': 'Australian Residential Mortgage',
       'Metro Commercial': 'Metro Commercial',
       'Metro Development': 'Metro Development',
       'Metro Residential': 'Metro Residential'
@@ -103,7 +103,7 @@ export const FIELD_MAPPINGS = {
       'Strata Title': '分层地契',
       'Freehold': '永久产权',
       'Leasehold': '租赁产权',
-      'Australian Residential Security': '澳洲住宅抵押贷款',
+      'Australian Residential Mortgage': '澳洲住宅抵押贷款',
       'Metro Commercial': '都市商业抵押',
       'Metro Development': '都市开发抵押',
       'Metro Residential': '都市住宅抵押'
