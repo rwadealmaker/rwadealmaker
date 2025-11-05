@@ -63,14 +63,16 @@ export const FIELD_MAPPINGS = {
       'Second Mortgage': 'Second Mortgage',
       'Third Mortgage': 'Third Mortgage',
       'Blanket Mortgage': 'Blanket Mortgage',
-      'Cross Collateral': 'Cross Collateral'
+      'Cross Collateral': 'Cross Collateral',
+      'Residential Mortgage': 'Residential Mortgage'
     },
     zh: {
       'First Mortgage': '第一顺位抵押',
       'Second Mortgage': '第二顺位抵押',
       'Third Mortgage': '第三顺位抵押',
       'Blanket Mortgage': '综合抵押',
-      'Cross Collateral': '交叉抵押'
+      'Cross Collateral': '交叉抵押',
+      'Residential Mortgage': '住宅抵押贷款'
     }
   },
 

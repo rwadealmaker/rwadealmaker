@@ -347,10 +347,10 @@
                   <span class="metric-label">{{ t('trade.lender') }}</span>
                   <span class="metric-value">{{ projectData?.lender || 'TBC' }}</span>
                 </div>
-                <!-- <div class="metric-item">
+                <div class="metric-item">
                   <span class="metric-label">{{ t('trade.borrower') }}</span>
-                  <span class="metric-value">{{ projectData?.borrower || 'TBC' }}</span>
-                </div> -->
+                  <span class="metric-value">{{ translateField('borrower', projectData?.borrower) || 'TBC' }}</span>
+                </div>
                 <div class="metric-item">
                   <span class="metric-label">{{ t('trade.loanAmount') }}</span>
                   <span class="metric-value">{{ projectData?.loanAmountFormatted || 'TBC' }}</span>

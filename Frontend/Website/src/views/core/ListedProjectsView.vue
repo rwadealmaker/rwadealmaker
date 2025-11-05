@@ -49,11 +49,11 @@
            <!-- <img :src="p.image" class="pf-project-image" :alt="p.code" /> -->
            <div class="pf-project-info">
              <div class="pf-title-row">
-               <h4 :id="'title-' + p.code">{{ p.code }} 
+               <h4 :id="'title-' + p.code">{{ p.code }}
                 <!-- • {{ p.name }} -->
               </h4>
              </div>
-             <p>{{ p.propertySummary }}</p>
+             <!-- <p>{{ p.propertySummary }}</p> -->
            </div>
            <button class="pf-project-btn pf-project-btn-secondary pf-title-btn" @click="openTrade(p.code)">{{ t('project.details') }}</button>
           </div>
