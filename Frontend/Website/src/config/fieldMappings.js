@@ -90,6 +90,8 @@ export const FIELD_MAPPINGS = {
       'Freehold': 'Freehold',
       'Leasehold': 'Leasehold',
       'Australian Residential Mortgage': 'Australian Residential Mortgage',
+      'Residential Mortgage': 'Residential Mortgage',
+      'Residential Land': 'Residential Land',
       'Metro Commercial': 'Metro Commercial',
       'Metro Development': 'Metro Development',
       'Metro Residential': 'Metro Residential'
@@ -106,6 +108,8 @@ export const FIELD_MAPPINGS = {
       'Freehold': '永久产权',
       'Leasehold': '租赁产权',
       'Australian Residential Mortgage': '澳洲住宅抵押贷款',
+      'Residential Mortgage': '住宅抵押贷款',
+      'Residential Land': '住宅土地',
       'Metro Commercial': '都市商业抵押',
       'Metro Development': '都市开发抵押',
       'Metro Residential': '都市住宅抵押'
